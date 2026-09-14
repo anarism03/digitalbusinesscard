@@ -1,0 +1,20 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="dbc-grad" x1="0" y1="0" x2="48" y2="48">
+      <stop stop-color="#16d3d6"/>
+      <stop offset="0.5" stop-color="#1f6fe5"/>
+      <stop offset="1" stop-color="#14248c"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="12" fill="url(#dbc-grad)"/>
+  <rect x="9" y="14" width="30" height="20" rx="4" fill="#fff"/>
+  <circle cx="16.5" cy="21.5" r="3.2" fill="#1f6fe5"/>
+  <path d="M11.5 29.5c0-2.5 2.3-4 5-4s5 1.5 5 4" stroke="#1f6fe5" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  <rect x="24" y="18.5" width="11" height="2.2" rx="1.1" fill="#9fc2f7"/>
+  <rect x="24" y="22.5" width="8" height="2.2" rx="1.1" fill="#d7e6fd"/>
+  <rect x="28" y="27" width="2.6" height="2.6" rx="0.6" fill="#1f6fe5"/>
+  <rect x="31.4" y="27" width="2.6" height="2.6" rx="0.6" fill="#16d3d6"/>
+  <rect x="28" y="30.4" width="2.6" height="2.6" rx="0.6" fill="#2b9bf0"/>
+  <rect x="31.4" y="30.4" width="2.6" height="2.6" rx="0.6" fill="#14248c"/>
+  <rect x="34.8" y="28.7" width="2.6" height="2.6" rx="0.6" fill="#9fc2f7"/>
+</svg>
