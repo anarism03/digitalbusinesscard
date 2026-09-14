@@ -229,6 +229,18 @@ export function addEmployee(employee: Employee): void {
   mockEmployees = [...mockEmployees, employee];
 }
 
+export function snapshotMockDb() {
+  return { employees: mockEmployees, company: mockCompany };
+}
+
+export function hydrateMockDb(state: {
+  employees?: Employee[];
+  company?: Partial<Company>;
+}): void {
+  if (state.employees) mockEmployees = state.employees;
+  if (state.company) mockCompany = { ...mockCompany, ...state.company };
+}
+
 function daysAgo(days: number): string {
   const date = new Date();
   date.setDate(date.getDate() - days);

@@ -6,6 +6,7 @@ import {
   addEmployee,
   findEmployee,
   findEmployeeByEmail,
+  hydrateMockDb,
   mockAuditLog,
   mockCompany,
   mockEmployees,
@@ -13,6 +14,7 @@ import {
   mockScanLogs,
   mockSuperAdminUser,
   otherMockCompanies,
+  snapshotMockDb,
   updateMockCompany,
   upsertEmployee,
 } from "./mockDb";
@@ -54,18 +56,29 @@ async function persistPhotoIfNeeded(
   }
 }
 
-async function withPersistedPhoto<T extends { id: string; photoUrl?: string }>(
-  employee: T,
-): Promise<T> {
+let hydratePromise: Promise<void> | null = null;
+
+function ensureHydrated(): Promise<void> {
+  if (!hydratePromise) {
+    hydratePromise = fetch("/api/db")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (data && (data.employees || data.company)) hydrateMockDb(data);
+      })
+      .catch(() => {});
+  }
+  return hydratePromise;
+}
+
+async function persistState(): Promise<void> {
   try {
-    const response = await fetch(
-      `/api/photo?employeeId=${encodeURIComponent(employee.id)}`,
-    );
-    if (!response.ok) return employee;
-    const { url } = (await response.json()) as { url: string };
-    return { ...employee, photoUrl: url };
+    await fetch("/api/db", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(snapshotMockDb()),
+    });
   } catch {
-    return employee;
+    // best effort — demo data, not worth surfacing a failure for
   }
 }
 
@@ -258,10 +271,10 @@ const routes: Route[] = [
   {
     method: "get",
     pattern: /^\/User\/([^/]+)$/,
-    handle: async (_config, match) => {
+    handle: (_config, match) => {
       const employee = findEmployee(match[1]);
       if (!employee) return { status: 404, data: { message: "Tapılmadı" } };
-      return { status: 200, data: await withPersistedPhoto(employee) };
+      return { status: 200, data: employee };
     },
   },
   {
@@ -471,10 +484,10 @@ const routes: Route[] = [
   {
     method: "get",
     pattern: /^\/cards\/([^/]+)$/,
-    handle: async (_config, match) => {
+    handle: (_config, match) => {
       const employee = findEmployee(match[1]);
       if (!employee) return { status: 404, data: { message: "Kart tapılmadı" } };
-      return { status: 200, data: await withPersistedPhoto(employee) };
+      return { status: 200, data: employee };
     },
   },
 ];
@@ -491,6 +504,8 @@ function findRoute(method: string, path: string) {
 export async function mockAdapter(
   config: InternalAxiosRequestConfig,
 ): Promise<AxiosResponse> {
+  await ensureHydrated();
+
   const method = (config.method ?? "get").toLowerCase();
   const path = (config.url ?? "").split("?")[0];
   const found = findRoute(method, path);
@@ -498,6 +513,10 @@ export async function mockAdapter(
   const result: MockResult = found
     ? await found.route.handle(config, found.match)
     : { status: 200, data: {} };
+
+  if (method !== "get" && result.status < 400) {
+    await persistState();
+  }
 
   return new Promise((resolve, reject) => {
     setTimeout(() => {
