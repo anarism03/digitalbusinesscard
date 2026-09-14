@@ -32,6 +32,43 @@ interface MockResult {
   data: unknown;
 }
 
+async function persistPhotoIfNeeded(
+  employeeId: string,
+  photoUrl: unknown,
+): Promise<string | undefined> {
+  if (typeof photoUrl !== "string" || !photoUrl.startsWith("data:")) {
+    return typeof photoUrl === "string" ? photoUrl : undefined;
+  }
+
+  try {
+    const response = await fetch("/api/photo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ employeeId, dataUrl: photoUrl }),
+    });
+    if (!response.ok) return photoUrl;
+    const { url } = (await response.json()) as { url: string };
+    return url;
+  } catch {
+    return photoUrl;
+  }
+}
+
+async function withPersistedPhoto<T extends { id: string; photoUrl?: string }>(
+  employee: T,
+): Promise<T> {
+  try {
+    const response = await fetch(
+      `/api/photo?employeeId=${encodeURIComponent(employee.id)}`,
+    );
+    if (!response.ok) return employee;
+    const { url } = (await response.json()) as { url: string };
+    return { ...employee, photoUrl: url };
+  } catch {
+    return employee;
+  }
+}
+
 function parseBody(config: InternalAxiosRequestConfig): Record<string, unknown> {
   const raw = config.data;
   if (!raw) return {};
@@ -164,7 +201,7 @@ interface Route {
   handle: (
     config: InternalAxiosRequestConfig,
     match: RegExpMatchArray,
-  ) => MockResult;
+  ) => MockResult | Promise<MockResult>;
 }
 
 const routes: Route[] = [
@@ -221,10 +258,10 @@ const routes: Route[] = [
   {
     method: "get",
     pattern: /^\/User\/([^/]+)$/,
-    handle: (_config, match) => {
+    handle: async (_config, match) => {
       const employee = findEmployee(match[1]);
       if (!employee) return { status: 404, data: { message: "Tapılmadı" } };
-      return { status: 200, data: employee };
+      return { status: 200, data: await withPersistedPhoto(employee) };
     },
   },
   {
@@ -240,8 +277,10 @@ const routes: Route[] = [
   {
     method: "put",
     pattern: /^\/CompanyAdmin\/users\/([^/]+)$/,
-    handle: (config, match) => {
-      const updated = upsertEmployee(match[1], parseBody(config));
+    handle: async (config, match) => {
+      const body = parseBody(config);
+      body.photoUrl = await persistPhotoIfNeeded(match[1], body.photoUrl);
+      const updated = upsertEmployee(match[1], body);
       if (!updated) return { status: 404, data: { message: "Tapılmadı" } };
       return { status: 200, data: updated };
     },
@@ -280,10 +319,11 @@ const routes: Route[] = [
   {
     method: "put",
     pattern: /^\/User\/profile$/,
-    handle: (config) => {
+    handle: async (config) => {
       const body = parseBody(config);
       const user = currentUser(config);
       const id = String(body.id ?? user?.id ?? "user-admin");
+      body.photoUrl = await persistPhotoIfNeeded(id, body.photoUrl);
       const updated = upsertEmployee(id, body) ?? mockEmployees[0];
       return { status: 200, data: updated };
     },
@@ -431,10 +471,10 @@ const routes: Route[] = [
   {
     method: "get",
     pattern: /^\/cards\/([^/]+)$/,
-    handle: (_config, match) => {
+    handle: async (_config, match) => {
       const employee = findEmployee(match[1]);
       if (!employee) return { status: 404, data: { message: "Kart tapılmadı" } };
-      return { status: 200, data: employee };
+      return { status: 200, data: await withPersistedPhoto(employee) };
     },
   },
 ];
@@ -448,7 +488,7 @@ function findRoute(method: string, path: string) {
   return null;
 }
 
-export function mockAdapter(
+export async function mockAdapter(
   config: InternalAxiosRequestConfig,
 ): Promise<AxiosResponse> {
   const method = (config.method ?? "get").toLowerCase();
@@ -456,7 +496,7 @@ export function mockAdapter(
   const found = findRoute(method, path);
 
   const result: MockResult = found
-    ? found.route.handle(config, found.match)
+    ? await found.route.handle(config, found.match)
     : { status: 200, data: {} };
 
   return new Promise((resolve, reject) => {
