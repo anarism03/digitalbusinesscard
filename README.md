@@ -2,7 +2,17 @@
 
 A web application for managing digital business cards, company hierarchies, and employee profiles. Built with React, TypeScript, and Tailwind CSS.
 
-This project provides a role-based dashboard where companies can manage their employees, generate QR codes for digital business cards, and track scan analytics.
+## Purpose
+
+Traditional paper business cards get lost, go out of date, and can't tell you who actually looked at them. This project replaces them with a **digital business card platform**: every employee gets a personal, always-up-to-date profile page (contact details, social links, job title, photo) that can be shared with a single tap, a QR code, or an NFC card — and every scan is tracked.
+
+The platform is built around three roles working together:
+
+* A **Super Admin** (the platform operator) onboards and manages client companies from a single dashboard.
+* Each client company's **Company Admin** manages their own team: adding employees, customizing their cards, tracking who is scanning them, and auditing every change.
+* **Employees** log in to their own portal to keep their profile current, without needing admin help for every small update.
+
+The result is a lightweight internal tool that a company can hand to its sales/support/ops team so their contact information is always accurate and easy to share.
 
 ## Features
 
@@ -73,15 +83,17 @@ The application will usually be running at `http://localhost:5173`.
 
 ## Demo mode
 
-This repository runs against **mock data** by default (`VITE_MOCK_MODE=true` in `.env.example`), so it works out of the box without a live backend. Use these accounts to sign in:
+This repository runs against **mock data** by default (`VITE_MOCK_MODE=true` in `.env.example`), so it works out of the box with no live backend, no database, and no setup beyond `npm install`.
 
-| Role | Email | Password |
-| --- | --- | --- |
-| Super Admin | `admin@demo.com` | `demo1234` |
-| Company Admin | `company@demo.com` | `demo1234` |
-| Employee | `employee@demo.com` | `demo1234` |
+### Credentials
 
-Super Admin signs in from `/login?mode=super-admin`; Company Admin and Employee use the regular `/login` page (VÖEN field accepts any 10-digit value in mock mode).
+The VÖEN field accepts any 10-digit value in mock mode:
+
+| Role | Login page | Email | Password | Can do |
+| --- | --- | --- | --- | --- |
+| Super Admin | `/login?mode=super-admin` | `admin@demo.com` | `demo1234` | Manage all client companies, view platform-wide stats |
+| Company Admin | `/login` | `company@demo.com` | `demo1234` | Manage the demo company's employees, cards, analytics, audit log, settings |
+| Employee | `/login` | `employee@demo.com` | `demo1234` | View and edit their own digital card profile |
 
 All data (companies, employees, scan logs, audit log) is generated in-memory and resets on page reload — nothing is sent to a real server. To point the app at the real backend instead, set `VITE_MOCK_MODE=false` in `.env`.
 

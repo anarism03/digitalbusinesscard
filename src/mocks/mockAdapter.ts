@@ -17,6 +17,15 @@ import {
   upsertEmployee,
 } from "./mockDb";
 import type { Employee } from "../types";
+import { decodeJwt } from "../utils/jwt";
+
+function currentUser(config: InternalAxiosRequestConfig) {
+  const header = config.headers?.get
+    ? config.headers.get("Authorization")
+    : (config.headers as Record<string, unknown> | undefined)?.Authorization;
+  const token = typeof header === "string" ? header.replace(/^Bearer\s+/i, "") : "";
+  return token ? decodeJwt(token) : null;
+}
 
 interface MockResult {
   status: number;
@@ -172,16 +181,20 @@ const routes: Route[] = [
   {
     method: "get",
     pattern: /^\/Auth\/account-info$/,
-    handle: () => ({
-      status: 200,
-      data: {
-        firstName: "Aygün",
-        lastName: "Məmmədova",
-        companyId: MOCK_COMPANY_ID,
-        canEdit: true,
-        isFirstLogin: false,
-      },
-    }),
+    handle: (config) => {
+      const user = currentUser(config);
+      const employee = user ? findEmployee(user.id) : undefined;
+      return {
+        status: 200,
+        data: {
+          firstName: employee?.firstName ?? user?.firstName ?? "",
+          lastName: employee?.lastName ?? user?.lastName ?? "",
+          companyId: user?.companyId ?? null,
+          canEdit: employee?.canEdit ?? user?.canEdit ?? true,
+          isFirstLogin: false,
+        },
+      };
+    },
   },
   {
     method: "get",
@@ -269,7 +282,8 @@ const routes: Route[] = [
     pattern: /^\/User\/profile$/,
     handle: (config) => {
       const body = parseBody(config);
-      const id = String(body.id ?? "user-admin");
+      const user = currentUser(config);
+      const id = String(body.id ?? user?.id ?? "user-admin");
       const updated = upsertEmployee(id, body) ?? mockEmployees[0];
       return { status: 200, data: updated };
     },
