@@ -42,18 +42,19 @@ function readMessage(data: unknown): string {
   if (typeof data === "string") return data;
   if (data && typeof data === "object") {
     const d = data as {
-      message?: string;
-      title?: string;
-      error?: string;
-      detail?: string;
+      message?: unknown;
+      title?: unknown;
+      error?: unknown;
+      detail?: unknown;
     };
-    return d.message ?? d.title ?? d.error ?? d.detail ?? "";
+    const value = d.message ?? d.title ?? d.error ?? d.detail ?? "";
+    return typeof value === "string" ? value : "";
   }
   return "";
 }
 
 function translateKnownMessage(text?: string): string | undefined {
-  const key = (text ?? "").trim().toLowerCase();
+  const key = String(text ?? "").trim().toLowerCase();
   if (!key) return undefined;
 
   if (key.includes("email") && key.includes("already in use")) {
