@@ -17,7 +17,9 @@ export default async function handler(
 
     try {
       const blob = await head(pathnameFor(employeeId));
-      return res.status(200).json({ url: blob.url });
+      return res
+        .status(200)
+        .json({ url: `${blob.url}?v=${blob.uploadedAt}` });
     } catch {
       return res.status(404).json({ message: "Not found" });
     }
@@ -45,6 +47,7 @@ export default async function handler(
         addRandomSuffix: false,
         allowOverwrite: true,
         contentType,
+        cacheControlMaxAge: 0,
       });
       return res.status(200).json({ url: blob.url });
     } catch (error) {

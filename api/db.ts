@@ -10,7 +10,9 @@ export default async function handler(
   if (req.method === "GET") {
     try {
       const blob = await head(STATE_PATH);
-      const response = await fetch(blob.url, { cache: "no-store" });
+      const response = await fetch(`${blob.url}?v=${Date.now()}`, {
+        cache: "no-store",
+      });
       const json = await response.json();
       return res.status(200).json(json);
     } catch {
@@ -25,6 +27,7 @@ export default async function handler(
         addRandomSuffix: false,
         allowOverwrite: true,
         contentType: "application/json",
+        cacheControlMaxAge: 0,
       });
       return res.status(200).json({ ok: true });
     } catch (error) {
