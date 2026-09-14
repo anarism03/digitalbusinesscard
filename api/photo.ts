@@ -39,14 +39,19 @@ export default async function handler(
     const [, contentType, base64] = match;
     const buffer = Buffer.from(base64, "base64");
 
-    const blob = await put(pathnameFor(employeeId), buffer, {
-      access: "public",
-      addRandomSuffix: false,
-      allowOverwrite: true,
-      contentType,
-    });
-
-    return res.status(200).json({ url: blob.url });
+    try {
+      const blob = await put(pathnameFor(employeeId), buffer, {
+        access: "public",
+        addRandomSuffix: false,
+        allowOverwrite: true,
+        contentType,
+      });
+      return res.status(200).json({ url: blob.url });
+    } catch (error) {
+      return res.status(500).json({
+        message: error instanceof Error ? error.message : "Upload failed",
+      });
+    }
   }
 
   res.setHeader("Allow", "GET, POST");
