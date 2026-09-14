@@ -60,7 +60,7 @@ let hydratePromise: Promise<void> | null = null;
 
 function ensureHydrated(): Promise<void> {
   if (!hydratePromise) {
-    hydratePromise = fetch("/api/db")
+    hydratePromise = fetch("/api/db", { cache: "no-store" })
       .then((response) => (response.ok ? response.json() : null))
       .then((data) => {
         if (data && (data.employees || data.company)) hydrateMockDb(data);
