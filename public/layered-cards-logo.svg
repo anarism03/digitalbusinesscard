@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1536" height="1536" viewBox="70 70 1110 1110" role="img" aria-labelledby="logo-title">
+  <title id="logo-title">Üç qatlı mavi kart loqosu</title>
+  <defs>
+    <linearGradient id="back-blue" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#0647ef"/>
+      <stop offset="0.56" stop-color="#0754fa"/>
+      <stop offset="1" stop-color="#0750ff"/>
+    </linearGradient>
+    <linearGradient id="edge-blue" x1="0" y1="1" x2="0.9" y2="0">
+      <stop offset="0" stop-color="#38bdff"/>
+      <stop offset="0.48" stop-color="#3bbaff"/>
+      <stop offset="1" stop-color="#0b85ff"/>
+    </linearGradient>
+    <linearGradient id="middle-blue" x1="0" y1="1" x2="0.9" y2="0">
+      <stop offset="0" stop-color="#0641ed"/>
+      <stop offset="0.5" stop-color="#0718cd"/>
+      <stop offset="1" stop-color="#0500bc"/>
+    </linearGradient>
+    <linearGradient id="front-blue" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#39b6fb"/>
+      <stop offset="0.42" stop-color="#188efe"/>
+      <stop offset="1" stop-color="#0061f9"/>
+    </linearGradient>
+    <linearGradient id="wave-blue" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#6ccfff"/>
+      <stop offset="0.52" stop-color="#57b7fc"/>
+      <stop offset="1" stop-color="#2592f9"/>
+    </linearGradient>
+    <linearGradient id="wave-sheen" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.02"/>
+      <stop offset="0.58" stop-color="#ffffff" stop-opacity="0.08"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.18"/>
+    </linearGradient>
+    <clipPath id="front-clip">
+      <path d="M392 566c0-45 22-78 62-100l552-277c73-37 152 10 152 94v480c0 71-30 112-91 142l-529 251c-70 34-146-11-146-87V566z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Rear cobalt card -->
+  <path fill="url(#back-blue)" d="M95 487c0-43 27-79 67-100l567-282c75-38 160 10 160 95v496c0 59-32 100-87 128L273 939c-78 39-178-9-178-91V487z"/>
+
+  <!-- Luminous rim of the middle card -->
+  <path fill="url(#edge-blue)" d="M190 490c0-43 24-77 64-98l540-273c73-37 148 8 148 91v495c0 60-29 100-84 128L344 934c-76 38-154-7-154-87V490z"/>
+
+  <!-- Deep blue middle card -->
+  <path fill="url(#middle-blue)" d="M255 541c0-45 24-80 66-101l517-264c74-38 150 8 150 89v506c0 64-29 104-84 132l-509 130c-70 36-140-9-140-88V541z"/>
+
+  <!-- Front card and its flowing lower facet -->
+  <path fill="url(#front-blue)" d="M392 566c0-45 22-78 62-100l552-277c73-37 152 10 152 94v480c0 71-30 112-91 142l-529 251c-70 34-146-11-146-87V566z"/>
+  <g clip-path="url(#front-clip)">
+    <path fill="url(#wave-blue)" d="M392 1017l223-111c60-30 89-72 120-130 25-48 56-88 113-119l310-173v748H392v-215z"/>
+    <path fill="url(#wave-sheen)" d="M698 864c55-33 65-89 111-147 20-26 44-48 74-65l275-151v133L883 787c-54 31-97 74-129 119l-362 223v-112l306-153z"/>
+    <path d="M392 1017l223-111c60-30 89-72 120-130 25-48 56-88 113-119l310-173" fill="none" stroke="#9cdbff" stroke-opacity="0.28" stroke-width="2"/>
+  </g>
+</svg>

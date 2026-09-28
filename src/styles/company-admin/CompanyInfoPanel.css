@@ -1,0 +1,255 @@
+.company-info-page {
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+  padding: 10px 18px 12px;
+  background: #fff;
+}
+
+.company-info-card {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: clamp(238px, 60vw, 264px);
+  overflow: hidden;
+  border: 1px solid #c4cbd5;
+  border-radius: 20px;
+  background:
+    radial-gradient(ellipse at 100% 100%, #e7ebf0 0%, transparent 45%),
+    linear-gradient(135deg, #fff 8%, #fcfcfd 37%, #f3f5f7 69%, #e9edf1 100%);
+  box-shadow:
+    0 18px 42px rgba(26, 44, 65, 0.09),
+    inset 0 1px 0 #fff,
+    inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+}
+
+.company-info-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 17px;
+  width: 44px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: var(--color-primary);
+}
+
+.company-info-card-waves {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  color: #c9d1db;
+  opacity: 0.84;
+  pointer-events: none;
+}
+
+.company-info-card-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 36px 25px 22px;
+}
+
+.company-info-logo {
+  display: flex;
+  width: min(64%, 210px);
+  height: 65px;
+  align-items: center;
+  color: var(--color-primary);
+  font-size: 34px;
+}
+
+.company-info-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.company-info-name {
+  max-width: 100%;
+  margin: auto 0 0;
+  color: #101a34;
+  font-size: clamp(30px, 9vw, 38px);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.13;
+  overflow-wrap: anywhere;
+}
+
+.company-info-voen {
+  display: flex;
+  min-width: 0;
+  align-self: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  padding-left: 14px;
+  border-left: 1px solid #c4cedb;
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.company-info-voen-icon {
+  flex: none;
+  font-size: 22px;
+}
+
+.company-info-voen > span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.company-info-voen-label {
+  color: var(--color-text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+}
+
+.company-info-voen-value {
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.company-info-contacts {
+  min-width: 0;
+  margin-top: 27px;
+}
+
+.company-info-contacts h2 {
+  margin: 0 0 10px;
+  color: var(--color-text);
+  font-size: 25px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.16;
+}
+
+.company-info-contacts h2::before {
+  content: "";
+  display: block;
+  width: 34px;
+  height: 3px;
+  margin-bottom: 13px;
+  border-radius: 3px;
+  background: var(--color-primary);
+}
+
+.company-info-contact-row {
+  display: grid;
+  grid-template-columns: 25px minmax(58px, 0.55fr) minmax(0, 1.45fr);
+  align-items: center;
+  column-gap: 11px;
+  min-height: 67px;
+  padding: 11px 4px;
+  border-bottom: 1px solid #dce2ea;
+  color: inherit;
+  text-decoration: none;
+}
+
+.company-info-contact-row:last-child {
+  border-bottom: 0;
+}
+
+.company-info-contact-icon {
+  color: var(--color-primary);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.company-info-contact-label {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.company-info-contact-value {
+  min-width: 0;
+  color: var(--color-text);
+  font-size: clamp(12.5px, 3vw, 13.5px);
+  font-weight: 600;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.company-info-contact-link {
+  transition: background 0.18s ease;
+}
+
+.company-info-contact-link:hover,
+.company-info-contact-link:focus-visible {
+  background: #f3f7fb;
+}
+
+@media (max-width: 559px) {
+  .company-info-card {
+    min-height: clamp(190px, 28dvh, 238px);
+  }
+}
+
+@media (max-width: 559px) and (max-height: 740px) {
+  .company-info-card-content {
+    padding: 20px 20px 16px;
+  }
+
+  .company-info-logo {
+    height: 56px;
+  }
+
+  .company-info-contacts {
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 559px) and (max-height: 600px) {
+  .company-info-page {
+    padding-block: 6px 8px;
+  }
+
+  .company-info-contacts {
+    margin-top: 14px;
+  }
+
+  .company-info-contacts h2 {
+    margin-bottom: 6px;
+    font-size: 22px;
+  }
+
+  .company-info-contacts h2::before {
+    margin-bottom: 8px;
+  }
+
+  .company-info-contact-row {
+    min-height: 52px;
+    padding-block: 8px;
+  }
+}
+
+@media (max-width: 370px) {
+  .company-info-page {
+    padding-inline: 14px;
+  }
+
+  .company-info-card-content {
+    padding-inline: 19px;
+  }
+
+  .company-info-contact-row {
+    column-gap: 8px;
+    grid-template-columns: 23px minmax(53px, 0.55fr) minmax(0, 1.45fr);
+  }
+}
