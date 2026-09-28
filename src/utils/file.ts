@@ -117,6 +117,10 @@ export async function rasterizeDataUrlToJpeg(
 }
 
 export function validateImageFile(file: File): boolean {
+  if (file.type === "image/svg+xml") {
+    message.error("SVG əvəzinə PNG, JPG və ya WebP seçin");
+    return false;
+  }
   if (!file.type.startsWith("image/")) {
     message.error("Yalnız şəkil faylı seçin");
     return false;

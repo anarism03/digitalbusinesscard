@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && tsc -p tsconfig.api.json && vite build",
+    "test": "tsx --test api/_handler.test.ts",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx",
     "lint:fix": "eslint . --ext ts,tsx --fix",
@@ -18,7 +19,9 @@
   "dependencies": {
     "@ant-design/icons": "^5.3.7",
     "@hookform/resolvers": "^3.3.4",
+    "@neondatabase/serverless": "^1.1.0",
     "@reduxjs/toolkit": "^2.12.0",
+    "@vercel/blob": "^2.8.0",
     "antd": "^5.14.2",
     "axios": "^1.6.8",
     "dayjs": "^1.11.21",
@@ -28,7 +31,8 @@
     "react-hook-form": "^7.51.0",
     "react-redux": "^9.3.0",
     "react-router-dom": "^7.18.4",
-    "xlsx": "^0.18.5",
+    "read-excel-file": "^9.3.10",
+    "write-excel-file": "^4.1.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -46,6 +50,7 @@
     "eslint-plugin-react-refresh": "^0.4.6",
     "postcss": "^8.4.38",
     "prettier": "^3.2.5",
+    "tsx": "^4.23.15",
     "typescript": "^5.4.2",
     "vite": "^8.3.1"
   }
