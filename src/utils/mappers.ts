@@ -126,6 +126,9 @@ export function mapCreatedCompany(raw: unknown) {
   const root = asRecord(raw);
   const data = asRecord(root.data ?? raw);
   const cRaw = asRecord(data.company ?? data.createdCompany ?? data);
+  const admin = asRecord(
+    data.admin ?? data.companyAdmin ?? root.admin ?? root.companyAdmin,
+  );
   const company = mapCompany(cRaw);
   return {
     company,
@@ -139,11 +142,9 @@ export function mapCreatedCompany(raw: unknown) {
     ),
     adminEmail: stringValue(
       data.adminEmail ??
-        data.email ??
         root.adminEmail ??
-        root.email ??
         cRaw.adminEmail ??
-        cRaw.email ??
+        admin.email ??
         company.adminEmail,
     ),
     defaultPassword: stringValue(
@@ -154,6 +155,8 @@ export function mapCreatedCompany(raw: unknown) {
         root.defaultPassword ??
         cRaw.adminPassword ??
         cRaw.defaultPassword ??
+        admin.defaultPassword ??
+        admin.password ??
         company.defaultPassword,
     ),
   };

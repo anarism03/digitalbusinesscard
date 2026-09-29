@@ -32,7 +32,7 @@ export default function ResetPasswordSuccessModal({
         >
           <span style={styles.title}>
             <LockOutlined style={styles.titleIcon} />
-            Şifrə dəyişdirildi
+            Şifrə sıfırlandı
           </span>
         </SwipeDownHandle>
       }

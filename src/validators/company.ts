@@ -19,7 +19,7 @@ const phoneSchema = phoneRequired("Telefon tələb olunur");
 
 const voenSchema = requiredText("VÖEN tələb olunur").refine(
   (v) => /^\d{10}$/.test(v),
-  "VÖEN 10 simvoldan ibarət olmalıdır",
+  "VÖEN 10 rəqəmdən ibarət olmalıdır",
 );
 
 export const companySchema = z.object({

@@ -35,7 +35,7 @@ export default function TeamListSection({ onSelectEmployee }: Props) {
     user,
     activeTab,
     searchQuery,
-    confirm,
+    confirmEmployee,
     closeConfirm,
     previewEmployee,
     setPreviewEmployee,
@@ -77,13 +77,13 @@ export default function TeamListSection({ onSelectEmployee }: Props) {
   return (
     <div style={styles.pageRoot}>
       <PageHeader
-        title="Komanda"
+        title="Əməkdaşlar"
         extra={
           <div style={styles.headerActions}>
             <Tooltip
               title={
                 limitReached
-                  ? `Şirkətiniz üçün əməkdaş limiti aşılıb (Maksimum: ${limit})`
+                  ? `Şirkətiniz əməkdaş limitinə çatıb (Maksimum: ${limit})`
                   : undefined
               }
             >
@@ -113,7 +113,7 @@ export default function TeamListSection({ onSelectEmployee }: Props) {
       {limit != null && limit > 0 && (
         <div style={styles.licenseCard}>
           <div style={styles.licenseHeaderRow}>
-            <span style={styles.licenseTitle}>Lisenziya istifadəsi</span>
+            <span style={styles.licenseTitle}>Əməkdaş limiti</span>
             <span style={styles.licenseCount}>
               {usedCount} / {limit}
             </span>
@@ -174,7 +174,17 @@ export default function TeamListSection({ onSelectEmployee }: Props) {
         {isLoading ? (
           <LoadingSkeleton />
         ) : pageItems.length === 0 ? (
-          <EmptyState description={s.empty} />
+          <EmptyState
+            description={
+              searchQuery.trim()
+                ? "Axtarışa uyğun əməkdaş tapılmadı"
+                : activeTab === "inactive"
+                  ? "Arxivdə əməkdaş yoxdur"
+                  : usedCount > 0
+                    ? "Aktiv əməkdaş yoxdur"
+                    : s.empty
+            }
+          />
         ) : (
           pageItems.map((employee) => (
             <EmployeeListCard
@@ -204,21 +214,19 @@ export default function TeamListSection({ onSelectEmployee }: Props) {
       </div>
 
       <ConfirmActionModal
-        open={confirm.open}
+        open={Boolean(confirmEmployee)}
         title={
-          confirm.targetStatus === "INACTIVE"
+          confirmEmployee?.isActive
             ? strings.common.deactivate
             : strings.common.activate
         }
         message={
-          confirm.targetStatus === "INACTIVE"
-            ? s.confirmDeactivate
-            : s.confirmActivate
+          confirmEmployee?.isActive ? s.confirmDeactivate : s.confirmActivate
         }
         loading={setActive.isPending}
-        danger={confirm.targetStatus === "INACTIVE"}
+        danger={Boolean(confirmEmployee?.isActive)}
         cancelButtonClassName={
-          confirm.targetStatus === "ACTIVE" ? "confirm-cancel-button-red" : ""
+          !confirmEmployee?.isActive ? "confirm-cancel-button-red" : ""
         }
         onConfirm={handleConfirmToggle}
         onCancel={closeConfirm}

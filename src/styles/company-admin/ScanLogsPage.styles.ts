@@ -98,7 +98,9 @@ export const styles = {
     cursor: "pointer",
     width: "100%",
     background: "transparent",
-    border: "none",
+    borderTop: "none",
+    borderRight: "none",
+    borderLeft: "none",
     textAlign: "left",
   },
   logRowLast: {

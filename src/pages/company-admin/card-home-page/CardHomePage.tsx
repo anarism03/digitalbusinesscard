@@ -4,6 +4,7 @@ import CardPanel from "./parts/CardPanel";
 import TeamListSection from "./parts/TeamListSection";
 import CompanyInfoPanel from "./parts/CompanyInfoPanel";
 import { useAppSelector } from "../../../store/hooks";
+import { parseCardViewParams } from "../../../utils/cardViewParams";
 import { updateSearchParams } from "../../../utils/urlSearch";
 
 export default function CardHomePage() {
@@ -13,10 +14,12 @@ export default function CardHomePage() {
   const setSearchParamsRef = useRef(setSearchParams);
   setSearchParamsRef.current = setSearchParams;
 
-  const context =
-    searchParams.get("context") === "company" ? "company" : "admin";
-  const view = searchParams.get("view") === "team" ? "team" : "card";
-  const employeeIdParam = searchParams.get("employeeId") || undefined;
+  const {
+    context,
+    view,
+    employeeId: employeeIdParam,
+    editMode,
+  } = parseCardViewParams(searchParams);
 
   const goToTeamMember = useCallback((id: string, edit: boolean) => {
     setSearchParamsRef.current((current) =>
@@ -41,8 +44,6 @@ export default function CardHomePage() {
       ? employeeIdParam
       : (user?.id ?? "");
   const isOwnCard = targetId === user?.id;
-  const editMode = searchParams.get("edit") === "1";
-
   const setCardEditMode = (editing: boolean) => {
     setSearchParams(
       (current) => updateSearchParams(current, { edit: editing ? "1" : null }),

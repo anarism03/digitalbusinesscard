@@ -7,7 +7,7 @@ import {
 } from "../../validators/auth";
 import { useFrameContainer } from "../layout/FrameContainerContext";
 import { useChangePassword } from "../../hooks/useUser";
-import { isOldPasswordError } from "../../utils/apiError";
+import { isOldPasswordError, showApiError } from "../../utils/apiError";
 import SwipeDownHandle from "../shared/SwipeDownHandle";
 
 interface ChangePasswordModalProps {
@@ -45,8 +45,10 @@ export default function ChangePasswordModal({
       if (isOldPasswordError(error)) {
         setError("oldPassword", {
           type: "server",
-          message: "Köhnə şifrə yanlışdır",
+          message: "Cari şifrə yanlışdır",
         });
+      } else {
+        showApiError(error);
       }
     }
   });
@@ -76,13 +78,13 @@ export default function ChangePasswordModal({
           control={control}
           render={({ field }) => (
             <Form.Item
-              label="Köhnə şifrə"
+              label="Cari şifrə"
               validateStatus={errors.oldPassword ? "error" : undefined}
               help={errors.oldPassword?.message}
             >
               <Input.Password
                 {...field}
-                placeholder="Köhnə şifrə"
+                placeholder="Cari şifrə"
                 autoComplete="current-password"
               />
             </Form.Item>
@@ -96,6 +98,7 @@ export default function ChangePasswordModal({
               label="Yeni şifrə"
               required
               validateStatus={errors.newPassword ? "error" : undefined}
+              help={errors.newPassword?.message}
             >
               <Input.Password
                 {...field}
@@ -110,13 +113,14 @@ export default function ChangePasswordModal({
           control={control}
           render={({ field }) => (
             <Form.Item
-              label="Yeni şifrə təkrar"
+              label="Yeni şifrəni təkrarlayın"
               required
               validateStatus={errors.confirmPassword ? "error" : undefined}
+              help={errors.confirmPassword?.message}
             >
               <Input.Password
                 {...field}
-                placeholder="Yeni şifrə təkrar"
+                placeholder="Yeni şifrəni təkrarlayın"
                 autoComplete="new-password"
               />
             </Form.Item>

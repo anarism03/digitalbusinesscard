@@ -12,7 +12,7 @@ import EmptyState from "../../../components/shared/EmptyState";
 import ErrorState from "../../../components/shared/ErrorState";
 import LoadingSkeleton from "../../../components/shared/LoadingSkeleton";
 import PageHeader from "../../../components/shared/PageHeader";
-import AssetAvatar from "../../../components/shared/AssetAvatar";
+import CompanyLogo from "../../../components/shared/CompanyLogo";
 import { strings } from "../../../constants/strings";
 import {
   useCompanies,
@@ -106,12 +106,7 @@ export default function DashboardPage() {
               key: "company",
               render: (_, row) => (
                 <div style={styles.recentCompanyRow}>
-                  <AssetAvatar
-                    src={row.logoUrl}
-                    name={row.name}
-                    size={34}
-                    shape="square"
-                  />
+                  <CompanyLogo src={row.logoUrl} name={row.name} size={34} />
                   <div>
                     <div style={styles.recentCompanyName}>{row.name}</div>
                     <div style={styles.recentCompanyMeta}>
@@ -166,12 +161,10 @@ export default function DashboardPage() {
               ) : (
                 <span style={styles.rankNumber}>{index + 1}</span>
               )}
-              <AssetAvatar
+              <CompanyLogo
                 src={row.logoUrl ?? companyLogoById.get(row.companyId)}
                 name={row.companyName}
                 size={30}
-                shape="square"
-                style={styles.topAvatar}
               />
               <span
                 style={

@@ -17,18 +17,6 @@ export const styles = {
     gap: 12,
     marginBottom: 12,
   },
-  logoAvatar: {
-    borderRadius: 10,
-    background: COLORS.primaryTint,
-    color: COLORS.primary,
-    flexShrink: 0,
-  },
-  avatarIcon: {
-    fontSize: 20,
-  },
-  logoImage: {
-    objectFit: "cover",
-  },
   identityText: {
     flex: 1,
     minWidth: 0,

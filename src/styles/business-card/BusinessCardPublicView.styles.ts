@@ -1,6 +1,23 @@
 import type { CSSProperties } from "react";
 import { COLORS } from "../../constants/ui";
 
+export const companyLogoCoverMediaStyle = {
+  boxSizing: "border-box",
+  padding: "48px 8% 56px",
+  background: "transparent",
+} satisfies CSSProperties;
+
+const coverMediaStyle = {
+  position: "absolute",
+  inset: 0,
+  zIndex: 1,
+  width: "100%",
+  height: "100%",
+  objectFit: "contain",
+  objectPosition: "center",
+  imageRendering: "auto",
+} satisfies CSSProperties;
+
 export const styles = {
   card: {
     background: "#fff",
@@ -22,15 +39,10 @@ export const styles = {
     boxShadow: "inset 0 0 0 1px rgba(15,23,42,.06)",
     isolation: "isolate",
   },
-  coverMedia: {
-    position: "absolute",
-    inset: 0,
-    zIndex: 1,
-    width: "100%",
-    height: "100%",
-    objectFit: "contain",
-    objectPosition: "center",
-    imageRendering: "auto",
+  coverMedia: coverMediaStyle,
+  companyLogoCoverMedia: {
+    ...coverMediaStyle,
+    ...companyLogoCoverMediaStyle,
   },
   coverPattern: {
     position: "absolute",
@@ -234,11 +246,16 @@ export const styles = {
   },
 } satisfies Record<string, CSSProperties>;
 
-export function getCoverStyle(image?: string): CSSProperties {
+export function getCoverStyle(
+  image?: string,
+  isCompanyLogo = false,
+): CSSProperties {
   return {
     ...styles.cover,
-    background: image
-      ? "linear-gradient(145deg, #eef3f9 0%, #ffffff 48%, #e9eff7 100%)"
-      : "linear-gradient(145deg, var(--card-accent-deep, #0d2466) 0%, var(--card-accent, #1657c9) 58%, #2a8fde 100%)",
+    background: isCompanyLogo
+      ? "transparent"
+      : image
+        ? "linear-gradient(145deg, #eef3f9 0%, #ffffff 48%, #e9eff7 100%)"
+        : "linear-gradient(145deg, var(--card-accent-deep, #0d2466) 0%, var(--card-accent, #1657c9) 58%, #2a8fde 100%)",
   };
 }

@@ -37,16 +37,12 @@
     </clipPath>
   </defs>
 
-  <!-- Rear cobalt card -->
   <path fill="url(#back-blue)" d="M95 487c0-43 27-79 67-100l567-282c75-38 160 10 160 95v496c0 59-32 100-87 128L273 939c-78 39-178-9-178-91V487z"/>
 
-  <!-- Luminous rim of the middle card -->
   <path fill="url(#edge-blue)" d="M190 490c0-43 24-77 64-98l540-273c73-37 148 8 148 91v495c0 60-29 100-84 128L344 934c-76 38-154-7-154-87V490z"/>
 
-  <!-- Deep blue middle card -->
   <path fill="url(#middle-blue)" d="M255 541c0-45 24-80 66-101l517-264c74-38 150 8 150 89v506c0 64-29 104-84 132l-509 130c-70 36-140-9-140-88V541z"/>
 
-  <!-- Front card and its flowing lower facet -->
   <path fill="url(#front-blue)" d="M392 566c0-45 22-78 62-100l552-277c73-37 152 10 152 94v480c0 71-30 112-91 142l-529 251c-70 34-146-11-146-87V566z"/>
   <g clip-path="url(#front-clip)">
     <path fill="url(#wave-blue)" d="M392 1017l223-111c60-30 89-72 120-130 25-48 56-88 113-119l310-173v748H392v-215z"/>

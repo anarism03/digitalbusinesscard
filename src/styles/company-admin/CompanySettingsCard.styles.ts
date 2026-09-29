@@ -48,25 +48,6 @@ export const styles = {
     marginBottom: 16,
     flexWrap: "wrap",
   },
-  bankIcon: {
-    fontSize: 29,
-  },
-  logoImage: {
-    objectFit: "contain",
-    padding: 7,
-  },
-  logoAvatar: {
-    width: 112,
-    minWidth: 112,
-    height: 76,
-    borderRadius: 14,
-    background: COLORS.primaryTint,
-    color: COLORS.primary,
-    fontSize: 32,
-    fontWeight: 700,
-    border: "none",
-    flexShrink: 0,
-  },
   uploadButton: {
     borderRadius: 14,
     height: 46,

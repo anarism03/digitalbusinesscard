@@ -28,8 +28,8 @@ export const createEmployeeSchema = z.object({
   ),
   phone1: phoneRequired("İş telefonu tələb olunur"),
   password: requiredLimitedText("Şifrə tələb olunur", "Şifrə", 150).min(
-    8,
-    "Şifrə ən az 8 simvol olmalıdır",
+    6,
+    "Şifrə ən az 6 simvol olmalıdır",
   ),
 });
 

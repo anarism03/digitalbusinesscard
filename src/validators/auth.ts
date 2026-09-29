@@ -40,7 +40,7 @@ export const changePasswordSchema = z
     newPassword: z
       .string()
       .min(1, "Yeni şifrə tələb olunur")
-      .min(8, "Şifrə ən az 8 simvol olmalıdır"),
+      .min(6, "Şifrə ən az 6 simvol olmalıdır"),
     confirmPassword: z.string().min(1, "Təkrar şifrə tələb olunur"),
   })
   .refine((d) => d.newPassword === d.confirmPassword, {

@@ -19,18 +19,6 @@ function readTab(value: string | null): EmployeeStatusTab {
   return value === "inactive" ? "inactive" : "active";
 }
 
-interface ConfirmState {
-  open: boolean;
-  item: Employee | null;
-  targetStatus: "ACTIVE" | "INACTIVE";
-}
-
-const CLOSED_CONFIRM: ConfirmState = {
-  open: false,
-  item: null,
-  targetStatus: "ACTIVE",
-};
-
 export function useTeamListSection(
   onSelectEmployee: (id: string, edit: boolean) => void,
 ) {
@@ -41,8 +29,8 @@ export function useTeamListSection(
   const activeTab = readTab(searchParams.get("status"));
   const searchQuery = searchParams.get("q") ?? "";
   const [visibleCount, setVisibleCount] = useState<number>(SIZES.tablePageSize);
-  const [confirm, setConfirm] = useState<ConfirmState>(CLOSED_CONFIRM);
-  const closeConfirm = useCallback(() => setConfirm(CLOSED_CONFIRM), []);
+  const [confirmEmployee, setConfirmEmployee] = useState<Employee | null>(null);
+  const closeConfirm = useCallback(() => setConfirmEmployee(null), []);
   const [previewEmployee, setPreviewEmployee] = useState<Employee | null>(null);
   const [shareEmployee, setShareEmployee] = useState<Employee | null>(null);
   const [identifiersEmployee, setIdentifiersEmployee] =
@@ -140,12 +128,7 @@ export function useTeamListSection(
   );
 
   const handleToggleActive = useCallback(
-    (row: Employee) =>
-      setConfirm({
-        open: true,
-        item: row,
-        targetStatus: row.isActive ? "INACTIVE" : "ACTIVE",
-      }),
+    (row: Employee) => setConfirmEmployee(row),
     [],
   );
 
@@ -155,9 +138,9 @@ export function useTeamListSection(
   );
 
   const handleConfirmToggle = () => {
-    if (!confirm.item) return;
-    const id = confirm.item.id;
-    const newStatus = !confirm.item.isActive;
+    if (!confirmEmployee) return;
+    const id = confirmEmployee.id;
+    const newStatus = !confirmEmployee.isActive;
 
     setStatusOverrides((prev) => ({ ...prev, [id]: newStatus }));
 
@@ -205,7 +188,7 @@ export function useTeamListSection(
     user,
     activeTab,
     searchQuery,
-    confirm,
+    confirmEmployee,
     closeConfirm,
     previewEmployee,
     setPreviewEmployee,

@@ -28,11 +28,6 @@ export const styles = {
     textAlign: "center",
     flexShrink: 0,
   },
-  topAvatar: {
-    borderRadius: 8,
-    background: COLORS.avatarMuted,
-    flexShrink: 0,
-  },
   topName: {
     flex: 1,
     minWidth: 0,

@@ -1,5 +1,6 @@
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { Skeleton } from "antd";
+import axios from "axios";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
@@ -136,6 +137,18 @@ export default function CardPage() {
   }
 
   if (isDeactivatedCard(error)) return <InactiveCardMessage />;
+
+  if (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return <MessageCard title={s.notFound} subtitle={s.notFoundSubtext} />;
+    }
+
+    const subtitle =
+      axios.isAxiosError(error) && !error.response
+        ? strings.errors.networkError
+        : strings.errors.generic;
+    return <MessageCard title="Vizitkart açılmadı" subtitle={subtitle} />;
+  }
 
   if (!employee || employee.role === ROLE_TO_NUM.SUPER_ADMIN) {
     return <MessageCard title={s.notFound} subtitle={s.notFoundSubtext} />;

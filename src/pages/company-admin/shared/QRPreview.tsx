@@ -1,33 +1,22 @@
 import { useEffect, useState } from "react";
-import {
-  getContactCardFields,
-  isContactCardEnabled,
-} from "../../../utils/contactCardFields";
 import { buildQrSvgDataUrl } from "../../../utils/qr";
-import { buildVcfText, overridesFromContactCard } from "../../../utils/vcard";
 import {
   getQrFallbackStyle,
   getQrImageStyle,
 } from "../../../styles/company-admin/QRPreview.styles";
-import type { Employee } from "../../../types";
 
 interface Props {
-  employee: Employee;
+  value: string;
   size: number;
 }
 
-export default function QRPreview({ employee, size }: Props) {
+export default function QRPreview({ value, size }: Props) {
   const [src, setSrc] = useState("");
 
   useEffect(() => {
     let mounted = true;
 
-    const overrides = overridesFromContactCard(
-      getContactCardFields(employee.contactInfos),
-      isContactCardEnabled(employee.contactInfos),
-    );
-
-    buildQrSvgDataUrl(buildVcfText(employee, overrides), size)
+    buildQrSvgDataUrl(value, size)
       .then((svgDataUrl) => {
         if (mounted) setSrc(svgDataUrl);
       })
@@ -38,7 +27,7 @@ export default function QRPreview({ employee, size }: Props) {
     return () => {
       mounted = false;
     };
-  }, [employee, size]);
+  }, [value, size]);
 
   if (!src) {
     return <div style={getQrFallbackStyle(size)}>QR</div>;

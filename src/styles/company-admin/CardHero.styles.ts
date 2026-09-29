@@ -1,22 +1,39 @@
 import type { CSSProperties } from "react";
+import { companyLogoCoverMediaStyle } from "../business-card/BusinessCardPublicView.styles";
 
 const GRADIENT =
   "linear-gradient(135deg, #0d2466 0%, #1657c9 58%, #2a8fde 100%)";
 
-export function getHeroStyle(backgroundSrc?: string): CSSProperties {
+export function getHeroStyle(
+  backgroundSrc?: string,
+  isCompanyLogo = false,
+): CSSProperties {
   return {
     width: "100%",
     aspectRatio: "16 / 9",
     borderRadius: 0,
-    background: backgroundSrc
-      ? "linear-gradient(145deg, #eef3f9 0%, #ffffff 48%, #e9eff7 100%)"
-      : GRADIENT,
+    background: isCompanyLogo
+      ? "transparent"
+      : backgroundSrc
+        ? "linear-gradient(145deg, #eef3f9 0%, #ffffff 48%, #e9eff7 100%)"
+        : GRADIENT,
     boxShadow: "inset 0 0 0 1px rgba(15,23,42,.06)",
     position: "relative",
     overflow: "hidden",
     isolation: "isolate",
   };
 }
+
+const backgroundMediaStyle = {
+  position: "absolute",
+  inset: 0,
+  zIndex: 1,
+  width: "100%",
+  height: "100%",
+  objectFit: "contain",
+  objectPosition: "center",
+  imageRendering: "auto",
+} satisfies CSSProperties;
 
 export const styles = {
   wrap: {
@@ -26,15 +43,10 @@ export const styles = {
     flexDirection: "column",
     alignItems: "center",
   },
-  backgroundMedia: {
-    position: "absolute",
-    inset: 0,
-    zIndex: 1,
-    width: "100%",
-    height: "100%",
-    objectFit: "contain",
-    objectPosition: "center",
-    imageRendering: "auto",
+  backgroundMedia: backgroundMediaStyle,
+  companyLogoCoverMedia: {
+    ...backgroundMediaStyle,
+    ...companyLogoCoverMediaStyle,
   },
   bgEditButton: {
     position: "absolute",

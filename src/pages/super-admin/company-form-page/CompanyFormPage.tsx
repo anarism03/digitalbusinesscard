@@ -56,7 +56,7 @@ export default function CompanyFormPage() {
 
       const created = await createCompany.mutateAsync(payload);
       const voen = created.voen || payload.voen;
-      if (created.adminEmail || created.defaultPassword || voen) {
+      if (created.adminEmail || created.defaultPassword) {
         setAdminInfo({
           email: created.adminEmail,
           password: created.defaultPassword,

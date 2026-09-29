@@ -29,7 +29,6 @@ export function useChangePassword() {
     (data: ChangePasswordDto) => authService.changePassword(data),
     {
       onSuccess: () => message.success("Şifrə uğurla dəyişdirildi"),
-      onError: showApiError,
     },
   );
 }

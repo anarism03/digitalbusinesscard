@@ -23,10 +23,12 @@ import { ROLE_LABELS } from "../../constants/roles";
 import { strings } from "../../constants/strings";
 import { COLORS } from "../../constants/ui";
 import { useAdminIdentity } from "../../hooks/useAdminIdentity";
+import { useEmployeesPage } from "../../hooks/useEmployees";
 import { useSwipeDrawer } from "../../hooks/useSwipeDrawer";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { setMobileDrawerOpen } from "../../store/uiSlice";
 import type { SidebarNavItem } from "../../types";
+import { parseCardViewParams } from "../../utils/cardViewParams";
 
 export default function CompanyAdminLayout({
   children,
@@ -70,23 +72,32 @@ function CompanyAdminLayoutContent({
   } = useAdminIdentity();
 
   const isCompanyAdmin = user?.role === "COMPANY_ADMIN";
+  const { data: employeePage } = useEmployeesPage(
+    isCompanyAdmin ? (user?.companyId ?? "") : "",
+    1,
+    1,
+  );
   const navItems = isCompanyAdmin ? COMPANY_ADMIN_ITEMS : EMPLOYEE_ITEMS;
   const cardRoute = isCompanyAdmin ? "/admin/card" : "/employee/profile";
-  const isTeamView = location.search.includes("view=team");
+  const cardViewParams = parseCardViewParams(
+    new URLSearchParams(location.search),
+  );
+  const isCardRoute =
+    (location.pathname.replace(/\/+$/, "") || "/") === cardRoute;
+  const isTeamView = isCardRoute && cardViewParams.view === "team";
   const isCompanyContext =
     isCompanyAdmin &&
     (COMPANY_ADMIN_ITEMS.some((item) =>
       location.pathname.startsWith(item.key),
     ) ||
-      location.search.includes("context=company"));
-  const isCardView =
-    (location.pathname.replace(/\/+$/, "") || "/") === cardRoute && !isTeamView;
-  const cardParams = new URLSearchParams(location.search);
+      location.pathname === "/admin/employees/new" ||
+      cardViewParams.context === "company");
+  const isCardView = isCardRoute && !isTeamView;
   const isCompanyInfoView =
     isCompanyAdmin &&
     isCardView &&
-    cardParams.get("context") === "company" &&
-    !cardParams.get("employeeId");
+    cardViewParams.context === "company" &&
+    !cardViewParams.employeeId;
 
   const [topbarTitle, setTopbarTitle] = useState<string>();
   const [logoutOpen, setLogoutOpen] = useState(false);
@@ -169,7 +180,7 @@ function CompanyAdminLayoutContent({
           isCompanyAdmin={isCompanyAdmin}
           companyLogoUrl={companyLogoUrl}
           companyName={companyName}
-          companyUsedCount={company?.usedCount}
+          companyUsedCount={employeePage?.totalCount}
           companyUserLimit={company?.userLimit}
           adminPhotoUrl={adminPhotoUrl}
           adminName={adminName}

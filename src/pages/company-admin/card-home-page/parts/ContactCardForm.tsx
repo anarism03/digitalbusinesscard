@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DatePicker, Form, Input } from "antd";
 import dayjs from "dayjs";
 import MobileBottomSheet from "../../../../components/shared/MobileBottomSheet";
@@ -14,6 +14,7 @@ const FIELD_MAX = 100;
 
 type FieldKind = "text" | "textarea" | "date";
 type FieldErrors = Partial<Record<keyof ContactCardFormValues, string>>;
+type NameParts = { firstName: string; lastName: string; middleName: string };
 
 interface FieldConfig {
   key: "jobTitle" | "website" | "birthday" | "additionalInfo";
@@ -58,11 +59,8 @@ interface Props {
   firstName: string;
   lastName: string;
   middleName: string;
-  onFirstNameChange: (value: string) => void;
-  onLastNameChange: (value: string) => void;
-  onMiddleNameChange: (value: string) => void;
   onClose: () => void;
-  onSave: (fields: ContactCardFormValues) => void;
+  onSave: (fields: ContactCardFormValues, nameParts: NameParts) => void;
   onDelete?: () => void;
 }
 
@@ -129,22 +127,27 @@ export default function ContactCardForm({
   firstName,
   lastName,
   middleName,
-  onFirstNameChange,
-  onLastNameChange,
-  onMiddleNameChange,
   onClose,
   onSave,
   onDelete,
 }: Props) {
   const [fields, setFields] = useState<ContactCardFormValues>(initial);
+  const [nameParts, setNameParts] = useState({
+    firstName,
+    lastName,
+    middleName,
+  });
   const [errors, setErrors] = useState<FieldErrors>({});
+  const wasOpen = useRef(false);
 
   useEffect(() => {
-    if (open) {
+    if (open && !wasOpen.current) {
       setFields(initial);
+      setNameParts({ firstName, lastName, middleName });
       setErrors({});
     }
-  }, [open, initial]);
+    wasOpen.current = open;
+  }, [open, initial, firstName, lastName, middleName]);
 
   const setField = (key: keyof ContactCardFormValues) => (value: string) => {
     setFields((prev) => ({ ...prev, [key]: value }));
@@ -157,18 +160,30 @@ export default function ContactCardForm({
       return;
     }
 
-    onSave({
-      buttonLabel: fields.buttonLabel.trim(),
-      name: [firstName, lastName, middleName].filter(Boolean).join(" "),
-      jobTitle: fields.jobTitle.trim(),
-      website: fields.website.trim(),
-      birthday: fields.birthday.trim(),
-      additionalInfo: fields.additionalInfo.trim(),
-    });
+    const nextNameParts = {
+      firstName: nameParts.firstName.trim(),
+      lastName: nameParts.lastName.trim(),
+      middleName: nameParts.middleName.trim(),
+    };
+    onSave(
+      {
+        buttonLabel: fields.buttonLabel.trim(),
+        name: Object.values(nextNameParts).filter(Boolean).join(" "),
+        jobTitle: fields.jobTitle.trim(),
+        website: fields.website.trim(),
+        birthday: fields.birthday.trim(),
+        additionalInfo: fields.additionalInfo.trim(),
+      },
+      nextNameParts,
+    );
   };
 
   return (
-    <MobileBottomSheet open={open} onClose={onClose} title="Kontaktı yüklə">
+    <MobileBottomSheet
+      open={open}
+      onClose={onClose}
+      title="Kontakt kartını tənzimlə"
+    >
       <Form layout="vertical">
         <FieldWithHint
           value={fields.buttonLabel}
@@ -179,22 +194,28 @@ export default function ContactCardForm({
           error={errors.buttonLabel}
         />
         <FieldWithHint
-          value={firstName}
-          onChange={onFirstNameChange}
+          value={nameParts.firstName}
+          onChange={(value) =>
+            setNameParts((prev) => ({ ...prev, firstName: value }))
+          }
           placeholder="Ad"
           hint="Kontaktda görünəcək ad"
           maxLength={FIELD_MAX}
         />
         <FieldWithHint
-          value={lastName}
-          onChange={onLastNameChange}
+          value={nameParts.lastName}
+          onChange={(value) =>
+            setNameParts((prev) => ({ ...prev, lastName: value }))
+          }
           placeholder="Soyad"
           hint="Kontaktda görünəcək soyad"
           maxLength={FIELD_MAX}
         />
         <FieldWithHint
-          value={middleName}
-          onChange={onMiddleNameChange}
+          value={nameParts.middleName}
+          onChange={(value) =>
+            setNameParts((prev) => ({ ...prev, middleName: value }))
+          }
           placeholder="Ata adı (ixtiyari)"
           hint="Kontaktda görünəcək ata adı"
           maxLength={50}

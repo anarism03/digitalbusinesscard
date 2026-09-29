@@ -71,7 +71,7 @@ export default function LinkTypePicker({ open, onClose, onSelect }: Props) {
 
       {featured.length > 0 && (
         <div>
-          <div style={styles.sectionTitle}>Seçilmiş</div>
+          <div style={styles.sectionTitle}>Əsas keçidlər</div>
           <div style={styles.grid}>{featured.map(renderItem)}</div>
         </div>
       )}

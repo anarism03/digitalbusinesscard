@@ -42,6 +42,7 @@ export default function StatsScanLogsSection({ onSelectEmployee }: Props) {
   const employeeId = searchParams.get("logsEmployeeId") || undefined;
   const logsFrom = searchParams.get("logsFrom");
   const logsTo = searchParams.get("logsTo");
+  const hasFilters = Boolean(employeeId || logsFrom || logsTo);
   const { data: employeesData } = useEmployees(companyId);
   const employees = useMemo(() => employeesData ?? [], [employeesData]);
 
@@ -144,7 +145,9 @@ export default function StatsScanLogsSection({ onSelectEmployee }: Props) {
           <ScanOutlined />
         </span>
         <span>
-          <span style={styles.statLabel}>Ümumi skan</span>
+          <span style={styles.statLabel}>
+            {hasFilters ? "Filtrə uyğun skan" : "Ümumi skan"}
+          </span>
           <span style={styles.statValue}>{total}</span>
         </span>
       </div>

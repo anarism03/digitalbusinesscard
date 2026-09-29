@@ -1,10 +1,7 @@
 import type { ChangeEvent } from "react";
-import { Avatar, Button, Form, Typography } from "antd";
-import {
-  BankOutlined,
-  DeleteOutlined,
-  UploadOutlined,
-} from "@ant-design/icons";
+import { Button, Form, Typography } from "antd";
+import { DeleteOutlined, UploadOutlined } from "@ant-design/icons";
+import CompanyLogo from "../../../../components/shared/CompanyLogo";
 import { styles } from "../../../../styles/super-admin/CompanyLogoField.styles";
 
 interface Props {
@@ -29,14 +26,9 @@ export default function CompanyLogoField({
       </Typography.Text>
       <Form.Item style={styles.logoItem}>
         <div style={styles.logoRow}>
-          {logoPreview ? (
-            <div style={styles.previewWrap}>
-              <img
-                src={logoPreview}
-                alt="logo"
-                loading="lazy"
-                style={styles.previewImage}
-              />
+          <div style={styles.previewWrap}>
+            <CompanyLogo src={logoPreview} size={80} />
+            {logoPreview && (
               <Button
                 type="text"
                 danger
@@ -45,19 +37,12 @@ export default function CompanyLogoField({
                 onClick={onRemove}
                 style={styles.removeButton}
               />
-            </div>
-          ) : (
-            <Avatar
-              size={80}
-              icon={<BankOutlined />}
-              shape="square"
-              style={styles.logoFallback}
-            />
-          )}
+            )}
+          </div>
           <div>
             <label style={styles.uploadLabel}>
               <div style={styles.uploadButton}>
-                <UploadOutlined /> {logoPreview ? "Loqonu dəyiş" : "Logo yüklə"}
+                <UploadOutlined /> {logoPreview ? "Loqonu dəyiş" : "Loqo yüklə"}
               </div>
               <input
                 type="file"

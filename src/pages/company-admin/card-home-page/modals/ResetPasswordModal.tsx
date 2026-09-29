@@ -69,7 +69,7 @@ export default function ResetPasswordModal({
         danger
         block
         loading={loading}
-        disabled={password.trim().length < 8}
+        disabled={password.trim().length < 6}
         onClick={() => onReset(password)}
       >
         Şifrəni sıfırla

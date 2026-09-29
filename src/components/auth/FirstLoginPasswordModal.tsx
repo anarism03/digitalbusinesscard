@@ -28,6 +28,7 @@ export default function FirstLoginPasswordModal({
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const getContainer = useFrameContainer();
+  const isExpired = reason === "expired";
 
   const {
     control,
@@ -47,7 +48,11 @@ export default function FirstLoginPasswordModal({
       }),
     {
       onSuccess: () => {
-        message.success("Şifrə təyin edildi. Yeni şifrə ilə daxil olun.");
+        message.success(
+          isExpired
+            ? "Şifrə yeniləndi. Yeni şifrə ilə daxil olun."
+            : "Şifrə təyin edildi. Yeni şifrə ilə daxil olun.",
+        );
         reset();
         dispatch(logout());
         navigate("/login", { replace: true });
@@ -55,8 +60,6 @@ export default function FirstLoginPasswordModal({
       onError: showApiError,
     },
   );
-
-  const isExpired = reason === "expired";
 
   return (
     <Modal
@@ -74,9 +77,12 @@ export default function FirstLoginPasswordModal({
         <Button
           key="logout"
           icon={<LogoutOutlined />}
-          onClick={() => dispatch(logout())}
+          onClick={() => {
+            dispatch(logout());
+            navigate("/login", { replace: true });
+          }}
         >
-          Loginə qayıt
+          Girişə qayıt
         </Button>,
         <Button
           key="save"
@@ -85,7 +91,7 @@ export default function FirstLoginPasswordModal({
           loading={changePassword.isPending}
           onClick={handleSubmit((v) => changePassword.mutate(v))}
         >
-          Şifrəni təyin et
+          {isExpired ? "Şifrəni yenilə" : "Şifrəni təyin et"}
         </Button>,
       ]}
     >
@@ -100,7 +106,9 @@ export default function FirstLoginPasswordModal({
         }
       />
       <Typography.Paragraph style={styles.description}>
-        Şifrə təyin olunana qədər digər səhifələrə giriş bağlanır.
+        {isExpired
+          ? "Şifrə yenilənənə qədər digər səhifələrə giriş bağlanır."
+          : "Şifrə təyin olunana qədər digər səhifələrə giriş bağlanır."}
       </Typography.Paragraph>
       <Form layout="vertical">
         <Controller
@@ -111,6 +119,7 @@ export default function FirstLoginPasswordModal({
               label={isExpired ? "Cari şifrə" : "Cari (müvəqqəti) şifrə"}
               required
               validateStatus={errors.oldPassword ? "error" : undefined}
+              help={errors.oldPassword?.message}
             >
               <Input.Password
                 {...field}
@@ -128,6 +137,7 @@ export default function FirstLoginPasswordModal({
               label="Yeni şifrə"
               required
               validateStatus={errors.newPassword ? "error" : undefined}
+              help={errors.newPassword?.message}
             >
               <Input.Password
                 {...field}
@@ -142,13 +152,14 @@ export default function FirstLoginPasswordModal({
           control={control}
           render={({ field }) => (
             <Form.Item
-              label="Yeni şifrə təkrar"
+              label="Yeni şifrəni təkrarlayın"
               required
               validateStatus={errors.confirmPassword ? "error" : undefined}
+              help={errors.confirmPassword?.message}
             >
               <Input.Password
                 {...field}
-                placeholder="Yeni şifrə təkrar"
+                placeholder="Yeni şifrəni təkrarlayın"
                 autoComplete="new-password"
               />
             </Form.Item>

@@ -8,6 +8,7 @@ interface Props {
   name: string;
   avatarSrc?: string;
   backgroundSrc?: string;
+  isCompanyLogoCover?: boolean;
   onEditAvatar?: () => void;
   onEditBackground?: () => void;
   onRemoveAvatar?: () => void;
@@ -18,6 +19,7 @@ export default function CardHero({
   name,
   avatarSrc,
   backgroundSrc,
+  isCompanyLogoCover = false,
   onEditAvatar,
   onEditBackground,
   onRemoveAvatar,
@@ -25,14 +27,21 @@ export default function CardHero({
 }: Props) {
   return (
     <div className="premium-card-hero-editor" style={styles.wrap}>
-      <div className="card-hero-cover" style={getHeroStyle(backgroundSrc)}>
+      <div
+        className="card-hero-cover"
+        style={getHeroStyle(backgroundSrc, isCompanyLogoCover)}
+      >
         {backgroundSrc && (
           <img
             src={backgroundSrc}
             alt=""
             aria-hidden="true"
             decoding="async"
-            style={styles.backgroundMedia}
+            style={
+              isCompanyLogoCover
+                ? styles.companyLogoCoverMedia
+                : styles.backgroundMedia
+            }
           />
         )}
         {onRemoveBackground && backgroundSrc && (

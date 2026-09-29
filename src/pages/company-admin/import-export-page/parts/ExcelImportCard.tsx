@@ -3,6 +3,7 @@ import type { UploadFile } from "antd";
 import type { ImportResult } from "../../../../types";
 import {
   CheckCircleOutlined,
+  CloseCircleOutlined,
   DownloadOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
@@ -14,6 +15,7 @@ interface ExcelImportCardProps {
   importLoading: boolean;
   importResult: ImportResult | null;
   limitReached: boolean;
+  canImport: boolean;
   templateLoading: boolean;
   setFileList: (files: UploadFile[]) => void;
   setImportResult: (result: ImportResult | null) => void;
@@ -27,6 +29,7 @@ export default function ExcelImportCard({
   importLoading,
   importResult,
   limitReached,
+  canImport,
   templateLoading,
   setFileList,
   setImportResult,
@@ -38,13 +41,13 @@ export default function ExcelImportCard({
       title={
         <span style={styles.cardTitle}>
           <UploadOutlined style={styles.importIcon} />
-          Excel İdxal
+          Excel idxalı
         </span>
       }
     >
       <p style={styles.importText}>
-        Əməkdaşları Excel faylından idxal et. Əvvəlcə şablonu yüklə, dolduraraq
-        göndər.
+        Əməkdaşları Excel faylından idxal edin. Əvvəlcə şablonu yükləyib
+        doldurun.
       </p>
       <Button
         icon={<DownloadOutlined />}
@@ -67,17 +70,33 @@ export default function ExcelImportCard({
         className="upload-block"
       >
         <Button icon={<UploadOutlined />} block style={styles.bottomButton}>
-          Fayl seç (.xlsx)
+          Fayl seç (.xlsx, .xls)
         </Button>
       </Upload>
 
       {importResult && (
         <Alert
           style={styles.bottomButton}
-          type={importResult.failed > 0 ? "warning" : "success"}
-          icon={<CheckCircleOutlined />}
+          type={
+            importResult.created === 0
+              ? "error"
+              : importResult.failed > 0
+                ? "warning"
+                : "success"
+          }
+          icon={
+            importResult.created === 0 ? (
+              <CloseCircleOutlined />
+            ) : (
+              <CheckCircleOutlined />
+            )
+          }
           showIcon
-          message={`${importResult.created} əməkdaş uğurla idxal edildi${importResult.failed > 0 ? `, ${importResult.failed} xəta` : ""}`}
+          message={
+            importResult.created === 0
+              ? `Heç bir əməkdaş idxal edilmədi${importResult.failed > 0 ? ` — ${importResult.failed} xəta` : ""}`
+              : `${importResult.created} əməkdaş uğurla idxal edildi${importResult.failed > 0 ? `, ${importResult.failed} xəta` : ""}`
+          }
           description={
             importResult.errors.length > 0 ? (
               <ul style={styles.errorList}>
@@ -95,7 +114,7 @@ export default function ExcelImportCard({
           type="warning"
           showIcon
           style={styles.bottomButton}
-          message={`Şirkətiniz üçün əməkdaş limiti aşılıb (Maksimum: ${companyLimit})`}
+          message={`Şirkətiniz əməkdaş limitinə çatıb (Maksimum: ${companyLimit})`}
           description="Limit hesablanarkən aktiv və deaktiv əməkdaşların hamısı nəzərə alınır."
         />
       )}
@@ -105,7 +124,7 @@ export default function ExcelImportCard({
         icon={<UploadOutlined />}
         loading={importLoading}
         onClick={onImport}
-        disabled={fileList.length === 0 || limitReached}
+        disabled={fileList.length === 0 || limitReached || !canImport}
         block
       >
         İdxal et

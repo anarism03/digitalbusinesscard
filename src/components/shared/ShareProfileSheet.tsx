@@ -11,12 +11,12 @@ import {
 import MobileBottomSheet from "./MobileBottomSheet";
 import QRPreview from "../../pages/company-admin/shared/QRPreview";
 import { copyToClipboard, message } from "../../utils/feedback";
+import { triggerBlobDownload } from "../../utils/file";
+import { buildQrBlob } from "../../utils/qr";
 import {
   getContactCardFields,
   isContactCardEnabled,
 } from "../../utils/contactCardFields";
-import { triggerBlobDownload } from "../../utils/file";
-import { buildQrBlob } from "../../utils/qr";
 import { buildVcfText, overridesFromContactCard } from "../../utils/vcard";
 import { styles } from "../../styles/shared/ShareProfileSheet.styles";
 import type { Employee } from "../../types";
@@ -43,6 +43,13 @@ export default function ShareProfileSheet({
   const [isDownloading, setIsDownloading] = useState(false);
   const displayName = employeeName || employee.fullName;
   const link = `${window.location.origin}/v/${employee.id}`;
+  const qrVCard = buildVcfText(
+    employee,
+    overridesFromContactCard(
+      getContactCardFields(employee.contactInfos),
+      isContactCardEnabled(employee.contactInfos),
+    ),
+  );
   const shareText = `${displayName}\n${link}`;
   const canNativeShare = typeof navigator.share === "function";
 
@@ -58,11 +65,7 @@ export default function ShareProfileSheet({
 
     setIsDownloading(true);
     try {
-      const overrides = overridesFromContactCard(
-        getContactCardFields(employee.contactInfos),
-        isContactCardEnabled(employee.contactInfos),
-      );
-      const blob = await buildQrBlob(buildVcfText(employee, overrides), format);
+      const blob = await buildQrBlob(qrVCard, format);
       triggerBlobDownload(blob, `qr-${employee.id}.${format}`);
     } catch {
       message.error("QR kod yüklənmədi");
@@ -82,12 +85,12 @@ export default function ShareProfileSheet({
       {view === "qr" ? (
         <div className="share-sheet-panel" style={styles.qrView}>
           <ScanOutlined style={styles.headerIcon} />
-          <div style={styles.title}>QR kodum</div>
+          <div style={styles.title}>QR kod</div>
           <div style={styles.subtitle}>
-            Digərləri profilinizi görmək üçün QR kodu skan edə bilər
+            QR kodu skan edib kontaktı internet olmadan saxlaya bilərsiniz
           </div>
           <div style={styles.qrFrame}>
-            <QRPreview employee={employee} size={164} />
+            <QRPreview value={qrVCard} size={164} />
           </div>
           <div className="share-sheet-actions" style={styles.actions}>
             <div
