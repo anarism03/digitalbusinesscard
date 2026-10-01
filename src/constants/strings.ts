@@ -1,6 +1,6 @@
 export const strings = {
   common: {
-    save: "Saxla",
+    save: "Yadda saxla",
     cancel: "Ləğv et",
     yes: "Bəli",
     no: "Xeyr",
@@ -55,7 +55,7 @@ export const strings = {
     archivedHint:
       "Deaktiv edilmiş əməkdaşlar arxivdə saxlanılır — tarixçə və analitika itmir.",
     identifiers: "İdentifikatorlar",
-    uidLabel: "QR-UID (unikal kod)",
+    uidLabel: "Vizitkart ID-si",
     cardLinkLabel: "Vizitkart linki",
     nfcLabel: "NFC etiket (URL)",
     createSuccess: "Əməkdaş uğurla yaradıldı",
@@ -86,11 +86,9 @@ export const strings = {
   publicCard: {
     inactive: "Vizitkart qeyri-aktivdir",
     notFound: "Vizitkart tapılmadı",
-    notFoundSubtext: "Bu UID ilə vizitkart mövcud deyil.",
+    notFoundSubtext: "Bu vizitkart mövcud deyil.",
   },
   importExport: {
-    title: "İxrac",
-    exportSection: "Excel İxrac (.xlsx)",
     exportSuccess: "İxrac uğurla tamamlandı",
     exportHint:
       "Bütün əməkdaşların məlumatları (S.A.A., vəzifə, əlaqə, vizitkart linki) .xlsx faylına yazılır.",
@@ -109,7 +107,6 @@ export const strings = {
     forbidden: "Bu səhifəyə giriş icazəniz yoxdur",
     serverError: "Server xətası. Zəhmət olmasa yenidən cəhd edin.",
     networkError: "Şəbəkə xətası. İnternet bağlantınızı yoxlayın.",
-    conflict:
-      "Bu məlumat artıq dəyişdirilib. Səhifəni yeniləyib yenidən cəhd edin.",
+    conflict: "Məlumatlar ziddiyyətlidir. Daxil etdiklərinizi yoxlayın.",
   },
 } as const;

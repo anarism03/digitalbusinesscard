@@ -1,33 +1,21 @@
-# SetClapp Digital Business Card — QA demo
+# SetClapp Digital Business Card
 
-This is a deployable mock-data copy of the supplied React application. Its components, styling, routes and assets are retained. API responses come from an in-browser demo adapter; it does not call the production API.
+The React app runs on Vercel. A Vercel Function serves the API. Shared company, employee, card and account data is encrypted and saved in Vercel Blob. Uploaded PNG, JPG, WebP and GIF images are also saved in Vercel Blob. Browser localStorage holds only the login session and UI preferences.
 
-## Run locally
+## Vercel setup
 
-Requires Node.js 20.19+ or 22.12+.
+1. Import `anarism03/digitalbusinesscard` into Vercel with the Vite preset. Use `npm ci`, `npm run build`, and `dist`.
+2. In the project's **Storage** tab, create a **public Vercel Blob** store and connect it to Production. Vercel supplies Blob credentials to its Functions automatically.
+3. In **Settings → Environment Variables**, set `AUTH_SECRET` to a random secret of at least 32 characters and `INITIAL_ADMIN_PASSWORD` to a strong temporary password. Add both to Production. Do not prefix them with `VITE_`. Keep `AUTH_SECRET` unchanged after data is saved because changing it makes saved data unreadable.
+4. Redeploy after connecting the store and setting the variables. Encrypted sample records are created in `mock-db/state.enc` on the first API request. Images appear under `images/` after upload.
+5. Sign in at `/login?mode=super-admin` with `superadmin@setclapp.example` and `INITIAL_ADMIN_PASSWORD`, then change the password. Sample company and employee accounts also start with `INITIAL_ADMIN_PASSWORD` until changed or reset.
 
-```bash
-npm ci
-npm run dev
-```
+The old browser-only demo's `setclapp-qa-demo-v1` localStorage data is **not** imported automatically. The new Blob store starts with the original sample companies and employees.
 
-Open `http://localhost:5173`. Run `npm run build` for the production build.
+Vercel Hobby includes **1 GB Blob storage** and **10 GB monthly Blob data transfer**, rather than 10 GB of stored files. See [Vercel Blob pricing](https://vercel.com/docs/vercel-blob/usage-and-pricing).
 
-## QA accounts
+## Local development
 
-| Role | Login URL | VÖEN | E-mail | Password |
-| --- | --- | --- | --- | --- |
-| Super Admin | `/login?mode=super-admin` | — | `superadmin@setclapp.example` | `Demo123!` |
-| Company Admin | `/login` | `1234567890` | `admin@caspian.example` | `Demo123!` |
-| Employee | `/login` | `1234567890` | `leyla@caspian.example` | `Demo123!` |
+Install dependencies with `npm ci`. To run the API locally, link the Vercel project, pull environment variables with `vercel env pull .env.local`, and run `vercel dev`. A plain Vite server does not run the `/api` Function. Keep `.env.local` out of Git.
 
-Public sample card: `/v/u-leyla`. NFC sample: `/v/u-leyla/nfc`. The demo also includes several companies and employees, scan data, audit history, company settings, card editing and Excel import/export. The initial demo records use `.example` e-mail domains and contain no customer data.
-
-Edits are stored in the **current browser's localStorage**. They persist through refresh but are separate for each browser/device. To restore the initial data, clear site data (or remove `setclapp-qa-demo-v1` from localStorage); sign out and sign in again if credentials were changed. QA downloads are generated in the browser.
-
-## Vercel deployment
-
-Import the project folder as a Vercel project. Set framework preset to **Vite**; install command `npm ci`, build command `npm run build`, output directory `dist`. No environment variables, API service or database are needed. The included `vercel.json` serves application routes directly on refresh.
-
-Because this is a front-end QA demo, sign-in data and changes are visible only in the same browser. It is not intended as production authentication or a multi-user data store.
-#
+Run `npm test` for server route checks and `npm run build` for TypeScript and the production bundle.

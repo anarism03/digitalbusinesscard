@@ -11,28 +11,21 @@ interface CompanyAdminCreatedModalProps {
 
 interface CopyableRowProps {
   label: string;
-  value?: string;
-  emptyText?: string;
+  value: string;
 }
 
-function CopyableRow({
-  label,
-  value,
-  emptyText = "Backend cavabında gəlmədi",
-}: CopyableRowProps) {
+function CopyableRow({ label, value }: CopyableRowProps) {
   return (
     <Typography.Paragraph style={styles.paragraph}>
-      <b>{label}:</b> {value || emptyText}
-      {value && (
-        <Button
-          type="text"
-          size="small"
-          icon={<CopyOutlined />}
-          onClick={() => copyToClipboard(value)}
-          style={styles.copyButton}
-          aria-label={`${label} kopyala`}
-        />
-      )}
+      <b>{label}:</b> {value}
+      <Button
+        type="text"
+        size="small"
+        icon={<CopyOutlined />}
+        onClick={() => copyToClipboard(value)}
+        style={styles.copyButton}
+        aria-label={`${label} kopyala`}
+      />
     </Typography.Paragraph>
   );
 }
@@ -44,7 +37,7 @@ export default function CompanyAdminCreatedModal({
   return (
     <Modal
       open={Boolean(credentials)}
-      title="Company-admin avtomatik yaradıldı"
+      title="Şirkət yaradıldı"
       okText="Şirkətlərə qayıt"
       cancelButtonProps={{ style: styles.hiddenCancel }}
       onOk={onClose}
@@ -54,16 +47,18 @@ export default function CompanyAdminCreatedModal({
       <Alert
         type="success"
         showIcon
-        message="Yeni şirkətlə birlikdə company-admin məlumatları backend tərəfindən yaradıldı."
+        message="Şirkət admininin giriş məlumatlarını saxlayın."
         style={styles.successAlert}
       />
-      <CopyableRow label="Admin e-poçtu" value={credentials?.email} />
-      <CopyableRow label="Default şifrə" value={credentials?.password} />
-      <CopyableRow
-        label="VÖEN"
-        value={credentials?.voen}
-        emptyText="Qeyd olunmayıb"
-      />
+      {credentials?.email && (
+        <CopyableRow label="Admin e-poçtu" value={credentials.email} />
+      )}
+      {credentials?.password && (
+        <CopyableRow label="Müvəqqəti şifrə" value={credentials.password} />
+      )}
+      {credentials?.voen && (
+        <CopyableRow label="VÖEN" value={credentials.voen} />
+      )}
     </Modal>
   );
 }

@@ -66,7 +66,9 @@ export default function BusinessCardPublicView({
 }: Props) {
   const logoSrc = useAssetSrc(employee.companyLogoUrl);
   const photoSrc = useAssetSrc(employee.photoUrl);
-  const backgroundSrc = useAssetSrc(employee.cardBackgroundUrl) || logoSrc;
+  const customBackgroundSrc = useAssetSrc(employee.cardBackgroundUrl);
+  const backgroundSrc = customBackgroundSrc || logoSrc;
+  const isCompanyLogoCover = !customBackgroundSrc && Boolean(logoSrc);
   const [selectedGroup, setSelectedGroup] = useState<ViewLinkGroup | null>(
     null,
   );
@@ -84,9 +86,7 @@ export default function BusinessCardPublicView({
     .filter(Boolean)
     .join(" · ");
 
-  const rows = buildViewLinkRows(employee).filter(
-    (row) => row.id !== "core:phone2",
-  );
+  const rows = buildViewLinkRows(employee);
   const linkSections: LinkSection[] = [
     {
       title: "Əlaqələr",
@@ -95,7 +95,7 @@ export default function BusinessCardPublicView({
       Tile: ContactTile,
     },
     {
-      title: "Web Saytlar",
+      title: "Vebsaytlar",
       groups: categoryGroups(rows, "other", "core:googleMapsUrl"),
       layout: styles.linkList,
       Tile: LinkCard,
@@ -144,7 +144,7 @@ export default function BusinessCardPublicView({
         >
           <section
             className="public-card-cover"
-            style={getCoverStyle(backgroundSrc)}
+            style={getCoverStyle(backgroundSrc, isCompanyLogoCover)}
           >
             {backgroundSrc ? (
               <img
@@ -153,7 +153,11 @@ export default function BusinessCardPublicView({
                 alt=""
                 aria-hidden="true"
                 decoding="async"
-                style={styles.coverMedia}
+                style={
+                  isCompanyLogoCover
+                    ? styles.companyLogoCoverMedia
+                    : styles.coverMedia
+                }
               />
             ) : (
               <span style={styles.coverPattern} />
@@ -191,13 +195,13 @@ export default function BusinessCardPublicView({
               <button
                 type="button"
                 className="card-cover-edit"
-                aria-label="Profili düzəliş et"
+                aria-label="Profili redaktə et"
                 onClick={onEdit}
                 style={styles.coverEditButton}
               >
                 <EditOutlined />
                 <span className="card-cover-edit-label">
-                  Profili düzəliş et
+                  Profili redaktə et
                 </span>
               </button>
             )}

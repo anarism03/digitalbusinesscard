@@ -10,28 +10,6 @@ export const styles = {
     borderBottom: `1px solid ${COLORS.border}`,
     marginBottom: 16,
   },
-  headerLogo: {
-    width: 56,
-    height: 56,
-    flexShrink: 0,
-    borderRadius: "50%",
-    overflow: "hidden",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    background: COLORS.primarySoft,
-    border: `1px solid ${COLORS.border}`,
-  },
-  headerLogoImage: {
-    width: "100%",
-    height: "100%",
-    objectFit: "contain",
-    padding: 5,
-  },
-  headerLogoFallback: {
-    fontSize: 22,
-    color: COLORS.primary,
-  },
   headerText: {
     display: "flex",
     flexDirection: "column",

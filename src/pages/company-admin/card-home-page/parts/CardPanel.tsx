@@ -50,7 +50,7 @@ export default function CardPanel({
           onClick={() => onEditModeChange(false)}
         >
           <EyeOutlined />
-          Profil baxış
+          Profilə bax
         </button>
 
         <CardEditPanel

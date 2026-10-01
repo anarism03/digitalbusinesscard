@@ -37,7 +37,7 @@ export function useExcelImport(
     if (!companyId) return message.error("Şirkət ID tapılmadı");
     if (limitReached) {
       return message.error(
-        `Şirkətiniz üçün əməkdaş limiti aşılıb (Maksimum: ${companyLimit})`,
+        `Şirkətiniz əməkdaş limitinə çatıb (Maksimum: ${companyLimit})`,
       );
     }
     const file = fileList[0]?.originFileObj;
@@ -49,14 +49,28 @@ export function useExcelImport(
       const result = mapImportResult(
         await exportImportService.importExcel(companyId, file),
       );
-      setFileList([]);
-      invalidate(EMPLOYEES_QUERY_KEY);
       setImportResult(result);
-      message.success(
-        result
-          ? `${result.created} əməkdaş idxal edildi${result.failed ? `, ${result.failed} xəta` : ""}`
-          : "İdxal uğurla tamamlandı",
-      );
+      if (!result) {
+        message.error(
+          "İdxal nəticəsini təsdiqləmək mümkün olmadı. Yenidən cəhd etməzdən əvvəl əməkdaş siyahısını yoxlayın.",
+        );
+      } else if (result.created === 0) {
+        message.error(
+          result.failed > 0
+            ? `Heç bir əməkdaş idxal edilmədi: ${result.failed} xəta`
+            : "Heç bir əməkdaş idxal edilmədi",
+        );
+      } else {
+        setFileList([]);
+        invalidate(EMPLOYEES_QUERY_KEY);
+        if (result.failed) {
+          message.warning(
+            `${result.created} əməkdaş idxal edildi, ${result.failed} xəta`,
+          );
+        } else {
+          message.success(`${result.created} əməkdaş idxal edildi`);
+        }
+      }
     } catch (error) {
       showApiError(error);
     } finally {

@@ -5,13 +5,6 @@ export const styles = {
   logoItem: { marginBottom: 20 },
   logoRow: { display: "flex", alignItems: "center", gap: 16 },
   previewWrap: { position: "relative", flexShrink: 0 },
-  previewImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 12,
-    objectFit: "cover",
-    border: "1px solid #f0f0f0",
-  },
   removeButton: {
     position: "absolute",
     top: -8,
@@ -23,13 +16,6 @@ export const styles = {
     borderRadius: "50%",
     background: "#fff",
     border: "1px solid #ffccc7",
-  },
-  logoFallback: {
-    borderRadius: 12,
-    background: "#f4f5f7",
-    color: "#8c8c8c",
-    fontSize: 32,
-    flexShrink: 0,
   },
   uploadLabel: { cursor: "pointer" },
   uploadButton: {

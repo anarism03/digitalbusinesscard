@@ -12,6 +12,7 @@ import EmployeeForm from "./parts/EmployeeForm";
 import PageHeader from "../../../components/shared/PageHeader";
 import { ROLE_TO_NUM } from "../../../constants/roles";
 import { strings } from "../../../constants/strings";
+import { message } from "../../../utils/feedback";
 import type { EmployeeFormValues } from "../../../validators/employee";
 
 const TEAM_ROUTE = "/admin/card?context=company&view=team";
@@ -32,6 +33,7 @@ export default function EmployeeFormPage() {
     employees.length >= company.userLimit;
 
   const handleSubmit = async (values: EmployeeFormValues) => {
+    let newId: string;
     try {
       const created = await createEmployee.mutateAsync({
         ...values,
@@ -41,13 +43,24 @@ export default function EmployeeFormPage() {
         isActive: true,
       });
 
-      const newId = mapEmployee(created).id;
-      if (newId) await setCanEdit.mutateAsync({ id: newId, canEdit: false });
+      newId = mapEmployee(created).id;
+    } catch {
+      return;
+    }
 
-      navigate(
-        newId ? `/admin/card?context=company&employeeId=${newId}` : TEAM_ROUTE,
-      );
-    } catch {}
+    if (newId) {
+      try {
+        await setCanEdit.mutateAsync({ id: newId, canEdit: false });
+      } catch {
+        message.warning(
+          "Əməkdaş yaradıldı, amma redaktə icazəsi yenilənmədi. İcazəni tənzimləmələrdə yoxlayın.",
+        );
+      }
+    }
+
+    navigate(
+      newId ? `/admin/card?context=company&employeeId=${newId}` : TEAM_ROUTE,
+    );
   };
 
   return (
@@ -58,7 +71,7 @@ export default function EmployeeFormPage() {
           <Alert
             type="warning"
             showIcon
-            message="Şirkətiniz üçün əməkdaş limiti aşılıb"
+            message="Şirkətiniz əməkdaş limitinə çatıb"
             description={`Maksimum: ${company?.userLimit}. Deaktiv əməkdaşlar da limitə daxildir.`}
           />
         ) : (

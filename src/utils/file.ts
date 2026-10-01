@@ -37,6 +37,7 @@ export async function compressImageToDataUrl(
   file: File,
   maxSizePx = 1200,
   quality = 0.85,
+  preserveTransparency = false,
 ): Promise<string> {
   if (file.type === "image/svg+xml") {
     return readAsDataUrl(file);
@@ -58,7 +59,9 @@ export async function compressImageToDataUrl(
   const context = canvas.getContext("2d");
   if (!context) throw new Error("Canvas dəstəklənmir");
 
-  const keepAlpha = TRANSPARENT_TYPES.includes(file.type);
+  const keepAlpha =
+    TRANSPARENT_TYPES.includes(file.type) ||
+    (preserveTransparency && file.type !== "image/jpeg");
   let scale = Math.min(1, maxSizePx / Math.max(sourceWidth, sourceHeight));
   let result = "";
 
@@ -74,6 +77,10 @@ export async function compressImageToDataUrl(
     if (keepAlpha) {
       result = canvas.toDataURL("image/png");
       if (dataUrlSize(result) <= IMAGE_TARGET_SIZE_BYTES) return result;
+      if (preserveTransparency) {
+        scale *= 0.8;
+        continue;
+      }
     }
 
     context.fillStyle = "#fff";

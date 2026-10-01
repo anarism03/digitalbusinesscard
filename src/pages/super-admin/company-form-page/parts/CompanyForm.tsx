@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, Input, InputNumber, Button, Divider, Row, Col } from "antd";
 import PhoneInput from "../../../../components/shared/PhoneInput";
 import { useImageUpload } from "../../../../hooks/useImageUpload";
+import { COMPANY_LOGO_UPLOAD_OPTIONS } from "../../../../utils/companyLogo";
 import {
   companySchema,
   type CompanyFormValues,
@@ -45,7 +46,7 @@ export default function CompanyForm({
   existingVoens = [],
   submitText = strings.common.save,
 }: CompanyFormProps) {
-  const logoUpload = useImageUpload({ maxSizePx: 360, quality: 0.72 });
+  const logoUpload = useImageUpload(COMPANY_LOGO_UPLOAD_OPTIONS);
   const isEdit = Boolean(defaultValues?.id);
 
   const {

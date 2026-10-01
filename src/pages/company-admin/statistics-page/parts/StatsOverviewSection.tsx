@@ -116,7 +116,11 @@ export default function StatsOverviewSection({ onSelectEmployee }: Props) {
     isLoading: previousLoading,
     isError: previousError,
   } = useScansCount(previousParams);
-  const { data: chartData, isLoading: chartLoading } = useScansChart(params);
+  const {
+    data: chartData,
+    isLoading: chartLoading,
+    isError: chartError,
+  } = useScansChart(params, effectivePreset !== "day");
   const { data: ranking, isLoading: rankingLoading } =
     useEmployeesRanking(rankingParams);
 
@@ -124,7 +128,7 @@ export default function StatsOverviewSection({ onSelectEmployee }: Props) {
     () => employees.filter((e) => e.isActive).length,
     [employees],
   );
-  const averageDivisor = employeeId ? 1 : activeEmployeeCount;
+  const averageDivisor = employeeId ? 1 : employees.length;
   const averageScanCount =
     averageDivisor > 0 ? Math.round((totalScans ?? 0) / averageDivisor) : 0;
   const scanDifference = (totalScans ?? 0) - (previousScans ?? 0);
@@ -152,6 +156,7 @@ export default function StatsOverviewSection({ onSelectEmployee }: Props) {
   const {
     displayChartData,
     displayChartLoading,
+    displayChartError,
     tickFormatter: chartTickFormatter,
     headerLabel: headerRangeLabel,
   } = useStatsChartData({
@@ -162,6 +167,7 @@ export default function StatsOverviewSection({ onSelectEmployee }: Props) {
     employeeId,
     chartData,
     chartLoading,
+    chartError,
   });
 
   const filteredRanking = useMemo(() => {
@@ -227,7 +233,7 @@ export default function StatsOverviewSection({ onSelectEmployee }: Props) {
       />
 
       <Card style={styles.toggleCard} styles={{ body: styles.toggleBody }}>
-        <span style={styles.activeOnlyLabel}>Yalnız aktivlər</span>
+        <span style={styles.activeOnlyLabel}>Reytinqdə yalnız aktivlər</span>
         <Switch checked={onlyActive} onChange={setOnlyActive} />
       </Card>
 
@@ -256,7 +262,7 @@ export default function StatsOverviewSection({ onSelectEmployee }: Props) {
           <p style={styles.statLabel}>Ortalama skan</p>
           <p style={styles.statValue}>{averageScanCount}</p>
           <p style={styles.statCaption}>
-            {employeeId ? "seçilmiş əməkdaş üçün" : "1 əməkdaşa düşən"}
+            {employeeId ? "seçilmiş əməkdaş üçün" : "hazırkı əməkdaş başına"}
           </p>
         </Card>
         <Card
@@ -292,6 +298,7 @@ export default function StatsOverviewSection({ onSelectEmployee }: Props) {
           <ScanTrendChart
             data={displayChartData}
             loading={displayChartLoading}
+            errorMessage={displayChartError}
             tickFormatter={chartTickFormatter}
             headerLabel={headerRangeLabel}
           />

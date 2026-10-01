@@ -1,6 +1,7 @@
 import { message } from "../utils/feedback";
 import { showApiError } from "../utils/apiError";
 import { useApiQuery, useApiMutation } from "./useApi";
+import { EMPLOYEES_QUERY_KEY } from "./useEmployees";
 import { companiesService } from "../services/companies.service";
 import { strings } from "../constants/strings";
 import {
@@ -58,7 +59,12 @@ export function useUpdateCompany() {
     ({ id, data }: { id: string; data: UpdateCompanyDto }) =>
       companiesService.update(id, data).then(mapCompany),
     {
-      invalidates: [COMPANIES_QUERY_KEY, SUPER_ADMIN_DASHBOARD_KEY],
+      invalidates: [
+        COMPANIES_QUERY_KEY,
+        MY_COMPANY_QUERY_KEY,
+        SUPER_ADMIN_DASHBOARD_KEY,
+        EMPLOYEES_QUERY_KEY,
+      ],
       onSuccess: () => message.success(strings.companies.updateSuccess),
       onError: showApiError,
     },
@@ -101,7 +107,12 @@ export function useUpdateMyCompany() {
   return useApiMutation(
     (data: UpdateCompanyDto) => companiesService.updateMyCompany(data),
     {
-      invalidates: [MY_COMPANY_QUERY_KEY, COMPANIES_QUERY_KEY],
+      invalidates: [
+        MY_COMPANY_QUERY_KEY,
+        COMPANIES_QUERY_KEY,
+        SUPER_ADMIN_DASHBOARD_KEY,
+        EMPLOYEES_QUERY_KEY,
+      ],
       onSuccess: () => message.success("Şirkət məlumatları yeniləndi"),
       onError: showApiError,
     },

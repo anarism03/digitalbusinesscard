@@ -30,7 +30,6 @@ import {
   type ProfileEditValues,
 } from "../../../../validators/employee";
 import type {
-  ContactCardFields,
   ContactInfo,
   CoreLinkKey,
   EditingRow,
@@ -63,17 +62,6 @@ function parseFullNameInput(value: string) {
   const middleName = middleNameParts.join(" ");
 
   return { firstName, lastName, middleName };
-}
-
-function getContactCardDefaults(
-  employee: Employee,
-  fields: ContactCardFields,
-): ContactCardFields {
-  return {
-    buttonLabel: normalizeContactCardButtonLabel(fields.buttonLabel),
-    name: fields.name || employee.fullName,
-    website: fields.website,
-  };
 }
 
 export default function CardEditPanel({
@@ -140,12 +128,10 @@ export default function CardEditPanel({
   const fullName = [watch("firstName"), watch("lastName"), watch("middleName")]
     .filter(Boolean)
     .join(" ");
-  const contactCardDefaults = getContactCardDefaults(employee, {
-    ...contactCardFields,
-    name: contactCardFields.name || fullName,
-  });
   const contactCardFormDefaults = {
-    ...contactCardDefaults,
+    buttonLabel: normalizeContactCardButtonLabel(contactCardFields.buttonLabel),
+    name: contactCardFields.name || fullName || employee.fullName,
+    website: contactCardFields.website,
     jobTitle: watch("jobTitle") ?? "",
     birthday,
     additionalInfo: watch("additionalInfo") ?? "",
@@ -268,6 +254,7 @@ export default function CardEditPanel({
         name={employee.fullName}
         avatarSrc={avatarSrc}
         backgroundSrc={backgroundSrc}
+        isCompanyLogoCover={!backgroundPreview && Boolean(companyLogoSrc)}
         onEditAvatar={() => avatarFileInputRef.current?.click()}
         onEditBackground={() => backgroundFileInputRef.current?.click()}
         onRemoveAvatar={photo.src ? () => photo.reset() : undefined}
@@ -341,30 +328,12 @@ export default function CardEditPanel({
         firstName={watch("firstName") ?? ""}
         lastName={watch("lastName") ?? ""}
         middleName={watch("middleName") ?? ""}
-        onFirstNameChange={(value) =>
-          setNameParts(
-            value,
-            watch("lastName") ?? "",
-            watch("middleName") ?? "",
-          )
-        }
-        onLastNameChange={(value) =>
-          setNameParts(
-            watch("firstName") ?? "",
-            value,
-            watch("middleName") ?? "",
-          )
-        }
-        onMiddleNameChange={(value) =>
-          setNameParts(watch("firstName") ?? "", watch("lastName") ?? "", value)
-        }
         onClose={() => setContactFormOpen(false)}
-        onSave={({
-          jobTitle,
-          birthday: nextBirthday,
-          additionalInfo,
-          ...fields
-        }) => {
+        onSave={(
+          { jobTitle, birthday: nextBirthday, additionalInfo, ...fields },
+          { firstName, lastName, middleName },
+        ) => {
+          setNameParts(firstName, lastName, middleName);
           setValue("jobTitle", jobTitle, {
             shouldDirty: true,
             shouldValidate: true,
@@ -437,7 +406,7 @@ export default function CardEditPanel({
           style={styles.addLinkButton}
           onClick={() => setAddStep("picker")}
         >
-          <PlusOutlined /> Əlavə etmək
+          <PlusOutlined /> Əlavə et
         </button>
 
         <div style={styles.actions}>

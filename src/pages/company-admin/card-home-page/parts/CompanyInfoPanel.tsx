@@ -5,17 +5,17 @@ import {
   PhoneOutlined,
 } from "@ant-design/icons";
 import { useMyCompany } from "../../../../hooks/useCompanies";
-import { useAssetSrc } from "../../../../hooks/useAssetSrc";
+import CompanyLogo from "../../../../components/shared/CompanyLogo";
+import ErrorState from "../../../../components/shared/ErrorState";
 import LoadingSkeleton from "../../../../components/shared/LoadingSkeleton";
 import { publicLinkHref } from "../../../../utils/url";
 import "../../../../styles/company-admin/CompanyInfoPanel.css";
 
 export default function CompanyInfoPanel() {
-  const { data: company, isLoading } = useMyCompany();
-  const logoSrc = useAssetSrc(company?.logoUrl);
+  const { data: company, isLoading, isError, refetch } = useMyCompany();
 
   if (isLoading) return <LoadingSkeleton />;
-  if (!company) return null;
+  if (isError || !company) return <ErrorState onRetry={() => refetch()} />;
 
   const emailHref = company.email
     ? publicLinkHref(`mailto:${company.email}`)
@@ -76,11 +76,13 @@ export default function CompanyInfoPanel() {
 
         <div className="company-info-card-content">
           <div className="company-info-logo">
-            {logoSrc ? (
-              <img src={logoSrc} alt={`${company.name} loqosu`} />
-            ) : (
-              <BankOutlined aria-hidden="true" />
-            )}
+            <CompanyLogo
+              src={company.logoUrl}
+              name={company.name}
+              size={65}
+              variant="plain"
+              style={{ width: "100%", height: "100%" }}
+            />
           </div>
           <h1 className="company-info-name">{company.name}</h1>
           {company.voen && (

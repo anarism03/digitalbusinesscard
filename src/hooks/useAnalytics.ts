@@ -12,11 +12,11 @@ export function useScansCount(params?: AnalyticsQueryParams) {
   );
 }
 
-export function useScansChart(params?: AnalyticsQueryParams) {
+export function useScansChart(params?: AnalyticsQueryParams, enabled = true) {
   return useApiQuery(
     "analytics-chart",
     () => analyticsService.getScansChart(params).then(mapChart),
-    { deps: [params] },
+    { deps: [params], enabled },
   );
 }
 

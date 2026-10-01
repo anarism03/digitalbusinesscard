@@ -8,6 +8,7 @@ import { styles } from "../../styles/analytics/ScanTrendChart.styles";
 interface ScanTrendChartProps {
   data?: ScanChartPoint[];
   loading?: boolean;
+  errorMessage?: string | null;
   tickFormatter?: (date: string) => string;
   headerLabel?: string;
 }
@@ -36,6 +37,7 @@ function formatTooltipLabel(date: string): string {
 export default function ScanTrendChart({
   data,
   loading,
+  errorMessage,
   tickFormatter = formatDateShort,
   headerLabel,
 }: ScanTrendChartProps) {
@@ -66,6 +68,8 @@ export default function ScanTrendChart({
 
       {loading ? (
         <Skeleton active paragraph={{ rows: 3 }} />
+      ) : errorMessage ? (
+        <Empty description={errorMessage} style={styles.empty} />
       ) : n === 0 ? (
         <Empty description="Bu dövrdə skan yoxdur" style={styles.empty} />
       ) : (

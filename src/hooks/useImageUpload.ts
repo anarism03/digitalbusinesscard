@@ -7,12 +7,14 @@ interface ImageUploadOptions {
   initialSrc?: string | null;
   maxSizePx?: number;
   quality?: number;
+  preserveTransparency?: boolean;
 }
 
 export function useImageUpload({
   initialSrc,
   maxSizePx,
   quality,
+  preserveTransparency,
 }: ImageUploadOptions = {}) {
   const [src, setSrc] = useState(initialSrc ?? undefined);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -37,7 +39,12 @@ export function useImageUpload({
     const id = ++selection.current;
     setIsProcessing(true);
     try {
-      const result = await compressImageToDataUrl(file, maxSizePx, quality);
+      const result = await compressImageToDataUrl(
+        file,
+        maxSizePx,
+        quality,
+        preserveTransparency,
+      );
       if (id === selection.current) setSrc(result);
     } catch {
       if (id === selection.current) message.error("Şəkil yüklənmədi");

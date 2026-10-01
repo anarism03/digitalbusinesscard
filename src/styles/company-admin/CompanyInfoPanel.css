@@ -59,20 +59,8 @@
 }
 
 .company-info-logo {
-  display: flex;
   width: min(64%, 210px);
   height: 65px;
-  align-items: center;
-  color: var(--color-primary);
-  font-size: 34px;
-}
-
-.company-info-logo img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: left center;
 }
 
 .company-info-name {

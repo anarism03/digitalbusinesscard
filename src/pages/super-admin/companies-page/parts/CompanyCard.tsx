@@ -1,12 +1,11 @@
 import { Card, Popconfirm } from "antd";
 import {
-  BankOutlined,
   CheckOutlined,
   EditOutlined,
   SettingOutlined,
   StopOutlined,
 } from "@ant-design/icons";
-import AssetAvatar from "../../../../components/shared/AssetAvatar";
+import CompanyLogo from "../../../../components/shared/CompanyLogo";
 import type { Company } from "../../../../types";
 import { styles } from "../../../../styles/super-admin/CompanyCard.styles";
 
@@ -37,15 +36,7 @@ export default function CompanyCard({
       onClick={() => onEdit(company)}
     >
       <div style={styles.headerRow}>
-        <AssetAvatar
-          shape="square"
-          size={40}
-          src={company.logoUrl}
-          name={company.name}
-          icon={<BankOutlined style={styles.avatarIcon} />}
-          imageStyle={styles.logoImage}
-          style={styles.logoAvatar}
-        />
+        <CompanyLogo size={40} src={company.logoUrl} name={company.name} />
         <div style={styles.identityText}>
           <div style={styles.name}>{company.name}</div>
           <div style={styles.voen}>VÖEN {company.voen || "-"}</div>
@@ -62,7 +53,7 @@ export default function CompanyCard({
       </div>
 
       <div style={styles.limitRow}>
-        <span style={styles.limitLabel}>Lisenziya</span>
+        <span style={styles.limitLabel}>Əməkdaş limiti</span>
         <span style={styles.limitValue}>
           {used} / {limit}
         </span>

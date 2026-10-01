@@ -4,6 +4,7 @@ import { asRecord } from "./normalize";
 
 interface ApiErrorShape {
   message?: string;
+  config?: { url?: string };
   response?: { status?: number; data?: unknown };
 }
 
@@ -12,7 +13,7 @@ const ERROR_CODE_MAP: Record<string, string> = {
   VOEN_REQUIRED: "VÖEN daxil edilməlidir",
   VOEN_INVALID: "VÖEN düzgün daxil edilməyib",
   ACCOUNT_INACTIVE: "Bu hesab müvəqqəti aktiv deyil",
-  USER_LIMIT_EXCEEDED: "Şirkətiniz üçün əməkdaş limiti aşılıb",
+  USER_LIMIT_EXCEEDED: "Şirkətiniz üçün əməkdaş limitinə çatılıb",
   UNAUTHORIZED: strings.errors.unauthorized,
   FORBIDDEN: strings.errors.forbidden,
 };
@@ -41,11 +42,19 @@ function translateKnownMessage(text?: string): string | undefined {
   const key = (text ?? "").trim().toLowerCase();
   if (!key) return undefined;
 
-  if (key.includes("email") && key.includes("already in use")) {
-    return "Bu Gmail istifadə olunur, başqa Gmail daxil edin.";
+  if (
+    /email|e-poçt/.test(key) &&
+    /already in use|already exists|already taken|mövcuddur|istifadə olunur/.test(
+      key,
+    )
+  ) {
+    return "Bu e-poçt ünvanı artıq istifadə olunur.";
   }
 
   if (/voen|vöen/.test(key)) {
+    if (/already|exists|mövcuddur|istifadə olunur/.test(key)) {
+      return "Bu VÖEN artıq istifadə olunur.";
+    }
     return /required|empty|missing|null|tələb|boş/.test(key)
       ? ERROR_CODE_MAP.VOEN_REQUIRED
       : ERROR_CODE_MAP.VOEN_INVALID;
@@ -53,15 +62,15 @@ function translateKnownMessage(text?: string): string | undefined {
 
   if (/invalid login|invalid credentials/.test(key))
     return strings.auth.loginError;
-  if (/timeout|exceeded/.test(key)) {
+  if (key.includes("limit")) return ERROR_CODE_MAP.USER_LIMIT_EXCEEDED;
+  if (/timeout|timed out/.test(key)) {
     return "Hazırda sistemlə bağlantı qurulmur. Zəhmət olmasa sonra yenidən cəhd edin.";
   }
-  if (isOldPasswordMessage(key)) return "Köhnə şifrə yanlışdır";
+  if (isOldPasswordMessage(key)) return "Cari şifrə yanlışdır";
   if (key.includes("password")) return "Şifrə məlumatları düzgün deyil";
   if (/inactive|deactiv/.test(key)) return ERROR_CODE_MAP.ACCOUNT_INACTIVE;
   if (/cannot log in|can not log in/.test(key))
     return "Bu hesabla daxil olmaq mümkün deyil";
-  if (key.includes("limit")) return ERROR_CODE_MAP.USER_LIMIT_EXCEEDED;
   if (/network|failed to fetch/.test(key)) return strings.errors.networkError;
 
   return undefined;
@@ -81,6 +90,13 @@ export function getApiErrorMessage(error: unknown): string {
   const backendMessage = readMessage(data) || err?.message;
   const known = translateKnownMessage(backendMessage);
   if (known) return known;
+
+  if (
+    status === 401 &&
+    err?.config?.url?.toLowerCase().includes("/auth/login")
+  ) {
+    return strings.auth.loginError;
+  }
 
   if (status && STATUS_MESSAGE_MAP[status]) return STATUS_MESSAGE_MAP[status];
 

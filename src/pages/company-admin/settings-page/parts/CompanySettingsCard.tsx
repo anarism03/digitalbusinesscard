@@ -1,12 +1,7 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Card, Form, Input, Button, Upload } from "antd";
 import { useNavigate } from "react-router-dom";
-import {
-  UploadOutlined,
-  BankOutlined,
-  ShopOutlined,
-  EyeOutlined,
-} from "@ant-design/icons";
+import { UploadOutlined, ShopOutlined, EyeOutlined } from "@ant-design/icons";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import PhoneInput from "../../../../components/shared/PhoneInput";
@@ -15,7 +10,7 @@ import {
   useUpdateMyCompany,
 } from "../../../../hooks/useCompanies";
 import { useImageUpload } from "../../../../hooks/useImageUpload";
-import AssetAvatar from "../../../../components/shared/AssetAvatar";
+import CompanyLogo from "../../../../components/shared/CompanyLogo";
 import EmployeeLimitProgress from "./EmployeeLimitProgress";
 import LoadingSkeleton from "../../../../components/shared/LoadingSkeleton";
 import {
@@ -23,23 +18,11 @@ import {
   type CompanySettingsValues,
 } from "../../../../validators/company";
 import { styles } from "../../../../styles/company-admin/CompanySettingsCard.styles";
-import { companiesService } from "../../../../services/companies.service";
 import { isImageDataUrl } from "../../../../utils/url";
-import { resolveVcfPhotoDataUrl } from "../../../../utils/vcard";
-import type { Company, UpdateCompanyDto } from "../../../../types";
-
-function buildCompanyUpdatePayload(company: Company): UpdateCompanyDto {
-  return {
-    name: company.name,
-    voen: company.voen,
-    address: company.address,
-    email: company.email,
-    phone: company.phone,
-    logoUrl: company.logoUrl,
-    userLimit: company.userLimit,
-    nfcBaseUrl: company.nfcBaseUrl,
-  };
-}
+import {
+  COMPANY_LOGO_UPLOAD_OPTIONS,
+  resolveCompanyLogoDataUrl,
+} from "../../../../utils/companyLogo";
 
 interface CompanySettingsCardProps {
   usedCount: number | null;
@@ -49,34 +32,11 @@ export default function CompanySettingsCard({
   usedCount,
 }: CompanySettingsCardProps) {
   const navigate = useNavigate();
-  const { data: company, isLoading, refetch } = useMyCompany();
+  const { data: company, isLoading } = useMyCompany();
   const updateCompany = useUpdateMyCompany();
-  const logoUpload = useImageUpload({ maxSizePx: 360, quality: 0.72 });
+  const logoUpload = useImageUpload(COMPANY_LOGO_UPLOAD_OPTIONS);
+  const [isPreparingLogo, setIsPreparingLogo] = useState(false);
   const logoSrc = logoUpload.src ?? company?.logoUrl;
-  const healedLogoIdRef = useRef<string | null>(null);
-  useEffect(() => {
-    if (!company?.logoUrl) return;
-    if (isImageDataUrl(company.logoUrl)) return;
-    if (healedLogoIdRef.current === company.id) return;
-    healedLogoIdRef.current = company.id;
-
-    let cancelled = false;
-    resolveVcfPhotoDataUrl(company.logoUrl)
-      .then(async (base64) => {
-        if (cancelled || !base64) return;
-        await companiesService.updateMyCompany({
-          ...buildCompanyUpdatePayload(company),
-          logoUrl: base64,
-        });
-        if (!cancelled) void refetch();
-      })
-      .catch(() => {});
-
-    return () => {
-      cancelled = true;
-    };
-  }, [company, refetch]);
-
   const {
     control,
     handleSubmit,
@@ -114,10 +74,20 @@ export default function CompanySettingsCard({
   }, [logoUpload.src, setValue]);
 
   const onValid = async (values: CompanySettingsValues) => {
+    if (isPreparingLogo) return;
+    setIsPreparingLogo(true);
     try {
-      await updateCompany.mutateAsync(values);
+      const logoUrl =
+        values.logoUrl && !isImageDataUrl(values.logoUrl)
+          ? ((await resolveCompanyLogoDataUrl(values.logoUrl)) ??
+            values.logoUrl)
+          : values.logoUrl;
+      await updateCompany.mutateAsync({ ...values, logoUrl });
       logoUpload.reset();
-    } catch {}
+    } catch {
+    } finally {
+      setIsPreparingLogo(false);
+    }
   };
 
   if (isLoading) return <LoadingSkeleton />;
@@ -137,8 +107,8 @@ export default function CompanySettingsCard({
           type="text"
           htmlType="button"
           icon={<EyeOutlined />}
-          aria-label="Şirkət kartına önizləmə"
-          title="Şirkət kartına önizləmə"
+          aria-label="Şirkət kartını önizlə"
+          title="Şirkət kartını önizlə"
           disabled={!company}
           onClick={() => navigate("/admin/card?context=company")}
           style={styles.previewButton}
@@ -147,15 +117,7 @@ export default function CompanySettingsCard({
       style={styles.card}
     >
       <div style={styles.logoRow}>
-        <AssetAvatar
-          shape="square"
-          size={76}
-          src={logoSrc}
-          name={company?.name}
-          icon={<BankOutlined style={styles.bankIcon} />}
-          imageStyle={styles.logoImage}
-          style={styles.logoAvatar}
-        />
+        <CompanyLogo size={76} src={logoSrc} name={company?.name} />
         <Upload
           showUploadList={false}
           accept="image/*"
@@ -191,6 +153,7 @@ export default function CompanySettingsCard({
               label="Şirkətin adı"
               required
               validateStatus={errors.name ? "error" : undefined}
+              help={errors.name?.message}
             >
               <Input
                 {...field}
@@ -209,6 +172,7 @@ export default function CompanySettingsCard({
             <Form.Item
               label="Ünvan"
               validateStatus={errors.address ? "error" : undefined}
+              help={errors.address?.message}
             >
               <Input {...field} placeholder="Ünvan" maxLength={250} showCount />
             </Form.Item>
@@ -222,6 +186,7 @@ export default function CompanySettingsCard({
             <Form.Item
               label="E-poçt"
               validateStatus={errors.email ? "error" : undefined}
+              help={errors.email?.message}
             >
               <Input
                 {...field}
@@ -239,6 +204,7 @@ export default function CompanySettingsCard({
             <Form.Item
               label="Telefon"
               validateStatus={errors.phone ? "error" : undefined}
+              help={errors.phone?.message}
             >
               <PhoneInput
                 value={field.value}
@@ -256,6 +222,7 @@ export default function CompanySettingsCard({
             <Form.Item
               label="NFC Base URL"
               validateStatus={errors.nfcBaseUrl ? "error" : undefined}
+              help={errors.nfcBaseUrl?.message}
             >
               <Input
                 {...field}
@@ -270,8 +237,12 @@ export default function CompanySettingsCard({
         <Button
           type="primary"
           onClick={handleSubmit(onValid)}
-          loading={updateCompany.isPending || logoUpload.isProcessing}
-          disabled={logoUpload.isProcessing}
+          loading={
+            updateCompany.isPending ||
+            logoUpload.isProcessing ||
+            isPreparingLogo
+          }
+          disabled={logoUpload.isProcessing || isPreparingLogo}
           style={styles.saveButton}
         >
           Yadda saxla

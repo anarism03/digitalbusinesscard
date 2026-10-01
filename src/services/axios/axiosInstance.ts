@@ -1,7 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 import { getStore } from "./storeAccessor";
 import { isTrustedAssetUrl } from "../../utils/url";
-import { demoAdapter } from "../../mock/demo";
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
@@ -12,7 +11,6 @@ export function unwrapResponseData(response: AxiosResponse) {
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 15000,
-  adapter: demoAdapter,
 });
 
 apiClient.interceptors.request.use((config) => {

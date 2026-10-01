@@ -20,6 +20,6 @@ export function useAdminIdentity() {
     adminName,
     adminPhotoUrl: employee?.photoUrl || user?.photoUrl,
     companyName: employee?.companyName || company?.name || "Şirkət",
-    companyLogoUrl: employee?.companyLogoUrl || company?.logoUrl,
+    companyLogoUrl: company ? company.logoUrl : employee?.companyLogoUrl,
   };
 }

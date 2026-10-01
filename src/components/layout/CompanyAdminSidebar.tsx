@@ -1,7 +1,7 @@
-import { BankOutlined, CloseOutlined, RightOutlined } from "@ant-design/icons";
+import { CloseOutlined, RightOutlined } from "@ant-design/icons";
 import AssetAvatar from "../shared/AssetAvatar";
+import CompanyLogo from "../shared/CompanyLogo";
 import { strings } from "../../constants/strings";
-import { styles } from "../../styles/layout/CompanyAdminSidebar.styles";
 import type { SidebarNavItem } from "../../types";
 
 function LogoutIcon() {
@@ -95,15 +95,7 @@ export default function CompanyAdminSidebar({
             className="cadmin-sidebar-head"
             onClick={onSelectCompanyContext}
           >
-            <AssetAvatar
-              shape="square"
-              src={companyLogoUrl}
-              name={companyName}
-              icon={<BankOutlined />}
-              size={40}
-              style={styles.companyAvatar}
-              imageStyle={styles.companyAvatarImage}
-            />
+            <CompanyLogo src={companyLogoUrl} name={companyName} size={40} />
             <span className="cadmin-sidebar-head-text">
               <span className="cadmin-sidebar-name">{companyName}</span>
               {usagePercent !== null ? (

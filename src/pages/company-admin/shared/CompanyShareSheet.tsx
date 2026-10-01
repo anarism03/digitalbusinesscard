@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "antd";
 import {
-  BankOutlined,
   CopyOutlined,
   DownloadOutlined,
   EnvironmentOutlined,
@@ -11,8 +10,8 @@ import {
   WhatsAppOutlined,
 } from "@ant-design/icons";
 import MobileBottomSheet from "../../../components/shared/MobileBottomSheet";
+import CompanyLogo from "../../../components/shared/CompanyLogo";
 import { copyToClipboard, message } from "../../../utils/feedback";
-import { useAssetSrc } from "../../../hooks/useAssetSrc";
 import { buildQrBlob, buildQrSvgDataUrl } from "../../../utils/qr";
 import { buildCompanyVcfText } from "../../../utils/vcard";
 import { triggerBlobDownload } from "../../../utils/file";
@@ -32,15 +31,14 @@ function buildShareText(company: Company): string {
     `Şirkət Adı: ${company.name}`,
     company.voen ? `VÖEN: ${company.voen}` : undefined,
     company.address ? `Ünvan: ${company.address}` : undefined,
-    company.email ? `Email: ${company.email}` : undefined,
-    company.phone ? `Nömrə: ${company.phone}` : undefined,
+    company.email ? `E-poçt: ${company.email}` : undefined,
+    company.phone ? `Telefon: ${company.phone}` : undefined,
   ]
     .filter(Boolean)
     .join("\n");
 }
 
 export default function CompanyShareSheet({ open, onClose, company }: Props) {
-  const logoSrc = useAssetSrc(company.logoUrl);
   const shareText = buildShareText(company);
   const [qrSrc, setQrSrc] = useState("");
   const [qrDownloading, setQrDownloading] = useState(false);
@@ -90,7 +88,7 @@ export default function CompanyShareSheet({ open, onClose, company }: Props) {
       : null,
     company.email
       ? {
-          label: "Email",
+          label: "E-poçt",
           value: company.email,
           icon: <MailOutlined />,
           href: `mailto:${company.email}`,
@@ -98,7 +96,7 @@ export default function CompanyShareSheet({ open, onClose, company }: Props) {
       : null,
     company.phone
       ? {
-          label: "Nömrə",
+          label: "Telefon",
           value: company.phone,
           icon: <PhoneOutlined />,
           href: `tel:${company.phone}`,
@@ -109,17 +107,7 @@ export default function CompanyShareSheet({ open, onClose, company }: Props) {
   return (
     <MobileBottomSheet open={open} onClose={onClose} title="Şirkəti paylaş">
       <div style={styles.header}>
-        <div style={styles.headerLogo}>
-          {logoSrc ? (
-            <img
-              src={logoSrc}
-              alt={company.name}
-              style={styles.headerLogoImage}
-            />
-          ) : (
-            <BankOutlined style={styles.headerLogoFallback} />
-          )}
-        </div>
+        <CompanyLogo src={company.logoUrl} name={company.name} size={56} />
         <div style={styles.headerText}>
           <span style={styles.headerName}>{company.name}</span>
           {company.voen && (
@@ -232,7 +220,7 @@ export default function CompanyShareSheet({ open, onClose, company }: Props) {
             >
               <MailOutlined style={styles.shareIconGlyph} />
             </span>
-            Email
+            E-poçt
           </a>
           <button
             type="button"

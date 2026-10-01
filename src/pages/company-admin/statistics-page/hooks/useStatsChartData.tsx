@@ -41,9 +41,11 @@ function getHeaderRangeLabel(
   const end = dayjs(endDate);
 
   if (preset === "day") return end.format("D MMM");
-  if (preset === "year") return end.format("YYYY");
+  if (preset === "year")
+    return `${start.format("MMM YYYY")} – ${end.format("MMM YYYY")}`;
   if (start.isSame(end, "day")) return end.format("D MMM");
-  return `${start.format("DD")} – ${end.format("DD MMM")}`;
+  const format = start.isSame(end, "year") ? "D MMM" : "D MMM YYYY";
+  return `${start.format(format)} – ${end.format(format)}`;
 }
 
 function aggregateByMonth(points: ScanChartPoint[]): ScanChartPoint[] {
@@ -69,14 +71,18 @@ function useHourlyScanPoints(
 ) {
   const [points, setPoints] = useState<ScanChartPoint[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (preset !== "day") {
       setPoints(null);
+      setError(null);
       return;
     }
     let cancelled = false;
     setIsLoading(true);
+    setPoints(null);
+    setError(null);
 
     const buckets = Array.from({ length: 24 }, (_, hour) => ({
       date: `${String(hour).padStart(2, "0")}:00`,
@@ -108,12 +114,25 @@ function useHourlyScanPoints(
         if (items.length === 0) break;
         page += 1;
       }
-      if (!cancelled) setPoints(buckets);
+      if (cancelled) return;
+      if (fetched < total) {
+        setError(
+          page > HOURLY_MAX_PAGES
+            ? "Bu gün üçün skan sayı qrafikin məlumat həddini aşır"
+            : "Skan qrafiki tam yüklənmədi",
+        );
+        setPoints([]);
+      } else {
+        setPoints(buckets);
+      }
     };
 
     fetchAllPages()
       .catch(() => {
-        if (!cancelled) setPoints([]);
+        if (!cancelled) {
+          setError("Skan qrafiki yüklənmədi");
+          setPoints([]);
+        }
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false);
@@ -124,7 +143,7 @@ function useHourlyScanPoints(
     };
   }, [preset, companyId, startDate, endDate, employeeId]);
 
-  return { points, isLoading };
+  return { points, isLoading, error };
 }
 
 interface UseStatsChartDataArgs {
@@ -135,6 +154,7 @@ interface UseStatsChartDataArgs {
   employeeId?: string;
   chartData?: ScanChartPoint[];
   chartLoading: boolean;
+  chartError: boolean;
 }
 
 export function useStatsChartData({
@@ -145,6 +165,7 @@ export function useStatsChartData({
   employeeId,
   chartData,
   chartLoading,
+  chartError,
 }: UseStatsChartDataArgs) {
   const hourly = useHourlyScanPoints(
     preset,
@@ -168,15 +189,26 @@ export function useStatsChartData({
 
   const displayChartLoading =
     preset === "day" ? hourly.isLoading : chartLoading;
+  const displayChartError =
+    preset === "day"
+      ? hourly.error
+      : chartError
+        ? "Skan qrafiki yüklənmədi"
+        : null;
 
   const tickFormatter = (date: string) => {
     if (preset === "day") return date;
-    if (preset === "week") return dayjs(date).format("dd");
-    if (preset === "year") return dayjs(date).format("MMM");
+    if (preset === "year") return dayjs(`${date}-01`).format("MMM YY");
     return formatDateShort(date);
   };
 
   const headerLabel = getHeaderRangeLabel(preset, startDate, endDate);
 
-  return { displayChartData, displayChartLoading, tickFormatter, headerLabel };
+  return {
+    displayChartData,
+    displayChartLoading,
+    displayChartError,
+    tickFormatter,
+    headerLabel,
+  };
 }
