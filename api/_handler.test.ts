@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { before, test } from "node:test";
 import { seed } from "./_seed";
+import { decryptState, encryptState } from "./_db";
 import { readSession } from "./_auth";
 import { execute, HttpError } from "./_handler";
 
@@ -19,6 +20,15 @@ test("login signs a server-verifiable session", async () => {
   const session = readSession(new Request("https://example.test", { headers: { Authorization: `Bearer ${token}` } }));
   assert.equal(session?.sub, "u-admin");
   assert.equal(session?.role, "COMPANY_ADMIN");
+});
+
+test("shared Blob state is encrypted and can be restored", () => {
+  const state = seed();
+  const encrypted = encryptState(state);
+  assert.equal(encrypted.includes(Buffer.from(state.employees[0].email)), false);
+  assert.deepEqual(decryptState(encrypted), state);
+  encrypted[encrypted.length - 1] ^= 1;
+  assert.throws(() => decryptState(encrypted));
 });
 
 test("a company admin cannot read another company's users", async () => {

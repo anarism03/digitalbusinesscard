@@ -1,50 +1,75 @@
-import { neon } from "@neondatabase/serverless";
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
+import { BlobNotFoundError, BlobPreconditionFailedError, head, put } from "@vercel/blob";
 import { seed, type AppState } from "./_seed";
 
+const statePath = "mock-db/state.enc";
+
 export interface StoredState {
-  version: number;
+  version: string;
   data: AppState;
 }
 
-function client() {
-  const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
-  if (!url) throw new Error("DATABASE_URL is not configured");
-  return neon(url);
+function key(): Buffer {
+  const secret = process.env.AUTH_SECRET;
+  if (!secret || secret.length < 32) throw new Error("AUTH_SECRET must contain at least 32 characters");
+  return createHash("sha256").update("setclapp-blob-state-v1:").update(secret).digest();
 }
 
-let schemaReady: Promise<void> | undefined;
+export function encryptState(data: AppState): Buffer {
+  const iv = randomBytes(12);
+  const cipher = createCipheriv("aes-256-gcm", key(), iv);
+  const body = Buffer.concat([cipher.update(JSON.stringify(data), "utf8"), cipher.final()]);
+  return Buffer.concat([iv, cipher.getAuthTag(), body]);
+}
 
-function ensureSchema(): Promise<void> {
-  schemaReady ??= (async () => {
-    const sql = client();
-    await sql`CREATE TABLE IF NOT EXISTS app_state (
-      id TEXT PRIMARY KEY,
-      version INTEGER NOT NULL DEFAULT 1,
-      data JSONB NOT NULL
-    )`;
-    await sql`INSERT INTO app_state (id, data) VALUES ('main', ${JSON.stringify(seed())}::jsonb)
-      ON CONFLICT (id) DO NOTHING`;
-  })().catch(error => {
-    schemaReady = undefined;
+export function decryptState(value: Buffer): AppState {
+  if (value.length < 29) throw new Error("Stored state is invalid");
+  const decipher = createDecipheriv("aes-256-gcm", key(), value.subarray(0, 12));
+  decipher.setAuthTag(value.subarray(12, 28));
+  const data = JSON.parse(Buffer.concat([decipher.update(value.subarray(28)), decipher.final()]).toString("utf8")) as AppState;
+  if (!Array.isArray(data.companies) || !Array.isArray(data.employees) || !data.passwords) throw new Error("Stored state is invalid");
+  return data;
+}
+
+async function currentState() {
+  try {
+    return await head(statePath);
+  } catch (error) {
+    if (error instanceof BlobNotFoundError) return null;
     throw error;
-  });
-  return schemaReady;
+  }
 }
 
 export async function readState(): Promise<StoredState> {
-  await ensureSchema();
-  const sql = client();
-  const rows = await sql`SELECT version, data FROM app_state WHERE id = 'main'`;
-  const row = rows[0] as unknown as StoredState | undefined;
-  if (!row) throw new Error("App state could not be initialized");
-  return row;
+  const current = await currentState();
+  if (!current) {
+    try {
+      await put(statePath, encryptState(seed()), {
+        access: "public", contentType: "application/octet-stream", addRandomSuffix: false,
+      });
+    } catch (error) {
+      if (await currentState() === null) throw error;
+    }
+    return readState();
+  }
+
+  const response = await fetch(`${current.url}?v=${encodeURIComponent(current.etag)}`, { cache: "no-store" });
+  if (!response.ok) throw new Error("App state could not be read");
+  const data = decryptState(Buffer.from(await response.arrayBuffer()));
+  return { version: current.etag, data };
 }
 
-export async function writeState(previousVersion: number, data: AppState): Promise<boolean> {
-  const sql = client();
-  const rows = await sql`UPDATE app_state SET version = version + 1,
-    data = ${JSON.stringify(data)}::jsonb
-    WHERE id = 'main' AND version = ${previousVersion}
-    RETURNING version`;
-  return rows.length > 0;
+export async function writeState(previousVersion: string, data: AppState): Promise<boolean> {
+  try {
+    await put(statePath, encryptState(data), {
+      access: "public",
+      contentType: "application/octet-stream",
+      allowOverwrite: true,
+      ifMatch: previousVersion,
+    });
+    return true;
+  } catch (error) {
+    if (error instanceof BlobPreconditionFailedError) return false;
+    throw error;
+  }
 }
