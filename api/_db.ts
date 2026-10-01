@@ -1,6 +1,6 @@
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import { BlobNotFoundError, BlobPreconditionFailedError, head, put } from "@vercel/blob";
-import { seed, type AppState } from "./_seed";
+import { seed, type AppState } from "./_seed.js";
 
 const statePath = "mock-db/state.enc";
 

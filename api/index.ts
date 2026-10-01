@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { del } from "@vercel/blob";
-import { readSession } from "./_auth";
-import { readState, writeState } from "./_db";
-import { execute, HttpError } from "./_handler";
+import { readSession } from "./_auth.js";
+import { readState, writeState } from "./_db.js";
+import { execute, HttpError } from "./_handler.js";
 
 function imageUrls(value: unknown, found = new Set<string>()): Set<string> {
   if (typeof value === "string" && /^https:\/\/[^/]+\.public\.blob\.vercel-storage\.com\//.test(value)) found.add(value);

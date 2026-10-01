@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { before, test } from "node:test";
-import { seed } from "./_seed";
-import { decryptState, encryptState } from "./_db";
-import { readSession } from "./_auth";
-import { execute, HttpError } from "./_handler";
+import { seed } from "./_seed.js";
+import { decryptState, encryptState } from "./_db.js";
+import { readSession } from "./_auth.js";
+import { execute, HttpError } from "./_handler.js";
 
 before(() => {
   process.env.AUTH_SECRET = "test-secret-with-at-least-thirty-two-characters";

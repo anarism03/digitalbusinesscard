@@ -1,8 +1,8 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import { put } from "@vercel/blob";
 import type { Company, Employee } from "../src/types";
-import type { AppState } from "./_seed";
-import { hashPassword, issueToken, type Session, verifyPassword } from "./_auth";
+import type { AppState } from "./_seed.js";
+import { hashPassword, issueToken, type Session, verifyPassword } from "./_auth.js";
 
 export class HttpError extends Error {
   constructor(message: string, public status = 400) { super(message); }
